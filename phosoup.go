@@ -85,6 +85,10 @@ func DoThings(conn *irc.Connection, channel string, handle string) {
 				dn := "vera"
 				dword := cmd[1]
 				plugins.Dictword(conn, resp, dn, dword)
+			case strings.Contains(cmd[0], "astronomy"):
+				dword := strings.TrimPrefix(message, "!astronomy ")
+				query := "astronomy"
+				plugins.WeatherUnderground(conn, dword, query, resp)
 			case strings.Contains(cmd[0], "dict"):
 				dn := "wn"
 				dword := cmd[1]
@@ -93,13 +97,18 @@ func DoThings(conn *irc.Connection, channel string, handle string) {
 				dword := strings.TrimPrefix(message, "!drama ")
 				plugins.Dramatica(conn, resp, dword)
 			case strings.Contains(cmd[0], "help"):
-				conn.Privmsg(event.Nick, "commands are: acronym, drama, dict, urban, weather, wiki")
+				conn.Privmsg(event.Nick, "commands are: acronym, astronomy, drama, dict, tide, urban, weather, wiki")
+			case strings.Contains(cmd[0], "tide"):
+				dword := strings.TrimPrefix(message, "!tide ")
+				query := "tide"
+				plugins.WeatherUnderground(conn, dword, query, resp)
 			case strings.Contains(cmd[0], "urban"):
 				dword := strings.TrimPrefix(message, "!urban ")
 				plugins.Urban(conn, resp, dword)
 			case strings.Contains(cmd[0], "weather"):
 				dword := strings.TrimPrefix(message, "!weather ")
-				plugins.Weather(conn, resp, dword)
+				query := "weather"
+				plugins.WeatherUnderground(conn, dword, query, resp)
 			case strings.Contains(cmd[0], "wiki"):
 				dword := strings.TrimPrefix(message, "!wiki ")
 				plugins.Wiki(conn, resp, dword)
