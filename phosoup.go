@@ -93,10 +93,13 @@ func DoThings(conn *irc.Connection, channel string, handle string) {
 				dword := strings.TrimPrefix(message, "!drama ")
 				plugins.Dramatica(conn, resp, dword)
 			case strings.Contains(cmd[0], "help"):
-				conn.Privmsg(event.Nick, "commands are: acronym, drama, dict, urban, wiki")
+				conn.Privmsg(event.Nick, "commands are: acronym, drama, dict, urban, weather, wiki")
 			case strings.Contains(cmd[0], "urban"):
 				dword := strings.TrimPrefix(message, "!urban ")
 				plugins.Urban(conn, resp, dword)
+			case strings.Contains(cmd[0], "weather"):
+				dword := strings.TrimPrefix(message, "!weather ")
+				plugins.Weather(conn, resp, dword)
 			case strings.Contains(cmd[0], "wiki"):
 				dword := strings.TrimPrefix(message, "!wiki ")
 				plugins.Wiki(conn, resp, dword)
