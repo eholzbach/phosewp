@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type WeatherU struct {
@@ -220,16 +221,58 @@ func WeatherUnderground(conn *irc.Connection, dword string, query string, resp s
 		s := fmt.Sprintf("%s, %s, humidity %s, temperature %s°F\n", con.CurrentObservation.Weather, wind, humid, temp)
 		conn.Privmsgf(resp, s)
 	} else if query == "tide" {
-		l := strings.Split(con.Tide.Tidesummary[0].Date.Pretty, "on")
-		low := fmt.Sprintf("low of %s at %s", con.Tide.Tidesummary[0].Data.Height, strings.TrimSpace(l[0]))
-		h := strings.Split(con.Tide.Tidesummary[3].Date.Pretty, "on")
-		high := fmt.Sprintf("high of %s at %s", con.Tide.Tidesummary[3].Data.Height, strings.TrimSpace(h[0]))
-		lt := strings.Split(con.Tide.Tidesummary[4].Date.Pretty, "on")
-		lowt := fmt.Sprintf("low of %s at %s", con.Tide.Tidesummary[0].Data.Height, strings.TrimSpace(lt[0]))
-		ht := strings.Split(con.Tide.Tidesummary[7].Date.Pretty, "on")
-		hight := fmt.Sprintf("high of %s at %s", con.Tide.Tidesummary[3].Data.Height, strings.TrimSpace(ht[0]))
-		s := fmt.Sprintf("Today: %s, %s. Tomorrow: %s, %s.", low, high, lowt, hight)
-		conn.Privmsgf(resp, s)
+		var o []string
+		var p []string
+		s, _ := strconv.ParseInt(con.Tide.Tidesummary[0].Date.Epoch, 10, 64)
+		t := time.Unix(s, 0)
+		u := t.AddDate(0, 0, 1)
+		o = append(o, t.Format("Mon 02") + "; ")
+
+		for _, v := range con.Tide.Tidesummary {
+			i, _ := strconv.Atoi(v.Date.Mday)
+			if t.Day() == i {
+				switch {
+				case strings.Contains(v.Data.Type, "High Tide"):
+					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
+					t := time.Unix(s, 0)
+					a := t.Format("3:04pm")
+					f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
+					o = append(o, f)
+				case strings.Contains(v.Data.Type, "Low Tide"):
+					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
+					t := time.Unix(s, 0)
+					a := t.Format("3:04pm")
+					f := fmt.Sprintf("L: %s @ %s ", v.Data.Height, a)
+					o = append(o, f)
+				}
+			}
+		}
+
+		p = append(p, u.Format("Mon 02") + "; ")
+		for _, v := range con.Tide.Tidesummary {
+			i, _ := strconv.Atoi(v.Date.Mday)
+			if u.Day() == i {
+				switch {
+				case strings.Contains(v.Data.Type, "High Tide"):
+					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
+					t := time.Unix(s, 0)
+					a := t.Format("3:04pm")
+					f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
+					p = append(p, f)
+				case strings.Contains(v.Data.Type, "Low Tide"):
+					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
+					t := time.Unix(s, 0)
+					a := t.Format("3:04pm")
+					f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
+					p = append(p, f)
+				}
+			}
+		}
+
+		conn.Privmsg(resp, strings.Join(o, ""))
+		time.Sleep(300 * time.Millisecond)
+		conn.Privmsg(resp, strings.Join(p, ""))
+
 	} else if query == "astronomy" {
 		sr := fmt.Sprintf("%s:%s", con.SunPhase.Sunrise.Hour, con.SunPhase.Sunrise.Minute)
 		ss := fmt.Sprintf("%s:%s", con.SunPhase.Sunset.Hour, con.SunPhase.Sunset.Minute)
