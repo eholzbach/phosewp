@@ -102,6 +102,8 @@ func DoThings(conn *irc.Connection, channel string, handle string) {
 				dword := strings.TrimPrefix(message, "!tide ")
 				query := "tide"
 				plugins.WeatherUnderground(conn, dword, query, resp)
+			case strings.Contains(cmd[0], "trivia"):
+				plugins.Trivia(conn, resp)
 			case strings.Contains(cmd[0], "urban"):
 				dword := strings.TrimPrefix(message, "!urban ")
 				plugins.Urban(conn, resp, dword)
