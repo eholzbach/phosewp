@@ -178,8 +178,8 @@ type WeatherU struct {
 		} `json:"sunset"`
 	} `json:"sun_phase"`
 }
-func WeatherUnderground(conn *irc.Connection, dword string, query string, resp string) {
-	k := "apikey"
+func WeatherUnderground(conn *irc.Connection, dword string, query string, resp string, wuapi string) {
+	k := wuapi
 
 	i := 0
 	for _, v := range dword {

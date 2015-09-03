@@ -4,22 +4,87 @@ import (
 	"flag"
 	"fmt"
 	"github.com/thoj/go-ircevent"
+	"io/ioutil"
+	"os"
+	"os/user"
 	"phosoup/plugins"
+	"runtime"
 	"strings"
 )
 
 func main() {
 
-	// get flags and dereference pointers
-	c := flag.String("c", "", "channel: channel to join, omit the #")
-	h := flag.String("h", "", "handle: nick for bot to use")
-	n := flag.String("n", "", "network: fqdn of server")
+	var c *string
+	var e string
+	var h *string
+	var n *string
+	var w *string
+	var channel string
+	var handle string
+	var network string
+	var wuapi string
 
-	flag.Parse()
+	user, err := user.Current()
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	channel := fmt.Sprint("#",*c)
-	network := *n
-	handle := *h
+	home := user.HomeDir
+	const conf string = "/.phosoup.conf"
+	d := home + conf
+
+	if _, err := os.Stat(d); os.IsNotExist(err) {
+		if runtime.GOOS == "freebsd" {
+			e = "/usr/local/etc/phosoup.conf"
+		} else {
+			e = "/etc/phosoup.conf"
+		}
+	} else {
+		e = d
+	}
+
+	if _, err := os.Stat(e); err == nil {
+
+		f, err := ioutil.ReadFile(e)
+
+		if err != nil {
+			panic(err)
+		}
+
+		g := strings.Split(string(f), "\n")
+
+		for _, v := range g {
+			t := strings.TrimSpace(v)
+			if strings.HasPrefix(t, "channel ") {
+				s := strings.Split(t, " ")
+				channel = s[1]
+			}
+			if strings.HasPrefix(t, "handle ") {
+				s := strings.Split(t, " ")
+				handle = s[1]
+			}
+			if strings.HasPrefix(t, "network ") {
+				s := strings.Split(t, " ")
+				network = s[1]
+			}
+			if strings.HasPrefix(t, "wuapi ") {
+				s := strings.Split(t, " ")
+				wuapi = s[1]
+			}
+		}
+	} else {
+		// get flags and dereference pointers
+		c = flag.String("c", "", "channel: channel to join")
+		h = flag.String("h", "", "handle: nick for bot to use")
+		n = flag.String("n", "", "network: fqdn of server")
+		w = flag.String("w", "", "wuapi: api key for weather underground")
+
+		flag.Parse()
+		channel = *c
+		network = *n
+		handle = *h
+		wuapi = *w
+	}
 
 	if len(channel) <= 1 {
 		fmt.Println("no channel")
@@ -39,17 +104,17 @@ func main() {
 	conn := irc.IRC(handle, handle)
 	netw := fmt.Sprint(network,":6667")
 
-	err := conn.Connect(netw)
+	err = conn.Connect(netw)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	DoThings(conn, channel, handle)
+	DoThings(conn, channel, handle, wuapi)
 	conn.Loop()
 }
 
-func DoThings(conn *irc.Connection, channel string, handle string) {
+func DoThings(conn *irc.Connection, channel string, handle string, wuapi string) {
 	conn.AddCallback("001", func (event *irc.Event) {
 		conn.Join(channel)
 	})
@@ -88,7 +153,7 @@ func DoThings(conn *irc.Connection, channel string, handle string) {
 			case strings.Contains(cmd[0], "astronomy"):
 				dword := strings.TrimPrefix(message, "!astronomy ")
 				query := "astronomy"
-				plugins.WeatherUnderground(conn, dword, query, resp)
+				plugins.WeatherUnderground(conn, dword, query, resp, wuapi)
 			case strings.Contains(cmd[0], "dict"):
 				dn := "wn"
 				dword := cmd[1]
@@ -101,14 +166,14 @@ func DoThings(conn *irc.Connection, channel string, handle string) {
 			case strings.Contains(cmd[0], "tide"):
 				dword := strings.TrimPrefix(message, "!tide ")
 				query := "tide"
-				plugins.WeatherUnderground(conn, dword, query, resp)
+				plugins.WeatherUnderground(conn, dword, query, resp, wuapi)
 			case strings.Contains(cmd[0], "urban"):
 				dword := strings.TrimPrefix(message, "!urban ")
 				plugins.Urban(conn, resp, dword)
 			case strings.Contains(cmd[0], "weather"):
 				dword := strings.TrimPrefix(message, "!weather ")
 				query := "weather"
-				plugins.WeatherUnderground(conn, dword, query, resp)
+				plugins.WeatherUnderground(conn, dword, query, resp, wuapi)
 			case strings.Contains(cmd[0], "wiki"):
 				dword := strings.TrimPrefix(message, "!wiki ")
 				plugins.Wiki(conn, resp, dword)
