@@ -26,12 +26,13 @@ func Urlresolve(conn *irc.Connection, resp string, message string) {
 				for _, g := range f {
 					if strings.Contains(g, "title>") ||
 					   strings.Contains(g, "Title>") ||
-                                           strings.Contains(g, "TITLE>") {
+					   strings.Contains(g, "TITLE>") {
 						h := strings.TrimSpace(g)
 						i := strings.Split(h, ">")
 						j := i[1]
 						k := strings.Replace(j, "\n", "", -1)
-						conn.Privmsgf(resp, k)
+						l := strings.TrimSpace(k)
+						conn.Privmsgf(resp, l)
 					}
 				}
 			}

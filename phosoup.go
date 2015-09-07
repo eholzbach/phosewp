@@ -162,7 +162,10 @@ func DoThings(conn *irc.Connection, channel string, handle string, wuapi string)
 				dword := strings.TrimPrefix(message, "!drama ")
 				plugins.Dramatica(conn, resp, dword)
 			case strings.Contains(cmd[0], "help"):
-				conn.Privmsg(event.Nick, "commands are: acronym, astronomy, drama, dict, tide, urban, weather, wiki")
+				conn.Privmsg(event.Nick, "commands are: acronym, astronomy, drama, dict, stock, tide, urban, weather, wiki")
+			case strings.Contains(cmd[0], "stock"):
+				dword := strings.TrimPrefix(message, "!stock ")
+				plugins.Stocks(conn, resp, dword)
 			case strings.Contains(cmd[0], "tide"):
 				dword := strings.TrimPrefix(message, "!tide ")
 				query := "tide"
