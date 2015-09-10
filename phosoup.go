@@ -137,14 +137,14 @@ func DoThings(conn *irc.Connection, channel string, handle string, wuapi string)
 
 	conn.AddCallback("PRIVMSG", func (event *irc.Event) {
 		message := event.Message()
+		var resp string
+		if strings.HasPrefix(event.Arguments[0], "#") {
+			resp = event.Arguments[0]
+		} else {
+			resp = event.Nick
+		}
 		if strings.HasPrefix(message, "!") == true {
 			cmd := strings.Split(message, " ")
-			var resp string
-			if strings.HasPrefix(event.Arguments[0], "#") {
-				resp = event.Arguments[0]
-			} else {
-				resp = event.Nick
-			}
 			switch {
 			case strings.Contains(cmd[0], "acronym"):
 				dn := "vera"
@@ -186,7 +186,7 @@ func DoThings(conn *irc.Connection, channel string, handle string, wuapi string)
 		}
 
 		if strings.Contains(message, "http://") || strings.Contains(message, "https://") {
-			plugins.Urlresolve(conn, channel, message)
+			plugins.Urlresolve(conn, resp, message)
 		}
 	})
 }
