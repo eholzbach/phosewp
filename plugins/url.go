@@ -33,6 +33,7 @@ func Urlresolve(conn *irc.Connection, resp string, message string) {
 						k := strings.Replace(j, "\n", "", -1)
 						l := strings.TrimSpace(k)
 						conn.Privmsgf(resp, l)
+						break
 					}
 				}
 			}
