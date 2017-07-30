@@ -7,8 +7,8 @@ import (
 
 func Config() (string, bool, string, []string, string) {
 
-	viper.SetConfigName("phosoup")
-	viper.SetConfigName(".phosoup")
+	viper.SetConfigName("phosewp")
+	viper.SetConfigName(".phosewp")
 	viper.AddConfigPath("/etc/")
 	viper.AddConfigPath("/usr/local/etc/")
 	viper.AddConfigPath("$HOME/")
