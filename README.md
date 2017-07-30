@@ -1,3 +1,18 @@
-![phosoup](http://semomarketplace.media.clients.ellingtoncms.com/img/marketplace/businesses/images/2014/11/20/Pho-logo_r470x260.jpeg)
+phosewp [![Build Status](https://travis-ci.org/eholzbach/phosewp.svg?branch=master)](https://travis-ci.org/eholzbach/phosewp)
+============
 
-I like soup.
+Yet another irc bot based on [go-ircevent](https://github.com/thoj/go-ircevent)
+
+## Configuration
+
+This uses [viper](https://github.com/spf13/viper) to resolve configuration files. JSON, TOML, YAML, and HCL are valid formats.
+
+Example:
+```
+network: chat.us.freenode.net:6697
+ssl: true
+handle: g1mpb0t
+channels:
+  - #leetbotz
+wuapi: api_key
+```

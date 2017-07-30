@@ -1,43 +1,73 @@
+/*
+  shitpost title parser
+*/
+
 package plugins
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/thoj/go-ircevent"
+	"golang.org/x/net/html"
+	"io"
 	"net/http"
 	"strings"
 )
 
-func Urlresolve(conn *irc.Connection, resp string, message string) {
-	a := strings.Split(message, " ")
-	for _, b := range a {
-		if strings.HasPrefix(b, "http://") || strings.HasPrefix(b, "https://") {
-			response, err := http.Get(b)
-			if err != nil {
-				fmt.Println(err)
-				return
+func Url(conn *irc.Connection) {
+	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
+		if strings.Contains(event.Message(), "http://") || strings.Contains(event.Message(), "https://") {
+
+			var replyto string
+
+			if strings.HasPrefix(event.Arguments[0], "#") {
+				replyto = event.Arguments[0]
 			} else {
-				defer response.Body.Close()
-				c := http.MaxBytesReader(nil, response.Body, 10000)
-				d := new(bytes.Buffer)
-				d.ReadFrom(c)
-				e := d.String()
-				f := strings.Split(string(e), "<")
-				for _, g := range f {
-					if strings.Contains(g, "title>") ||
-					   strings.Contains(g, "Title>") ||
-					   strings.Contains(g, "TITLE>") {
-						h := strings.TrimSpace(g)
-						i := strings.Split(h, ">")
-						j := i[1]
-						k := strings.Replace(j, "\n", "", -1)
-						l := strings.TrimSpace(k)
-						conn.Privmsgf(resp, l)
-						break
+				replyto = event.Nick
+			}
+
+			a := strings.Split(event.Message(), " ")
+			for _, b := range a {
+				if strings.HasPrefix(b, "http://") || strings.HasPrefix(b, "https://") {
+					response, err := http.Get(b)
+					if err != nil {
+						fmt.Println(err)
+						return
 					}
+					defer response.Body.Close()
+					if title, ok := GetTitle(response.Body); ok {
+						conn.Privmsg(replyto, title)
+					}
+
 				}
 			}
 		}
-	}
+	})
 }
 
+func GetTitle(r io.Reader) (string, bool) {
+	doc, err := html.Parse(r)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return traverse(doc)
+}
+
+func isTitleElement(n *html.Node) bool {
+	return n.Type == html.ElementNode && n.Data == "title"
+}
+
+func traverse(n *html.Node) (string, bool) {
+	if isTitleElement(n) {
+		return n.FirstChild.Data, true
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		result, ok := traverse(c)
+		if ok {
+			return result, ok
+		}
+	}
+
+	return "", false
+}

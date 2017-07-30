@@ -1,3 +1,7 @@
+/*
+  Not worthwhile yet not worthless.
+*/
+
 package plugins
 
 import (
@@ -10,56 +14,71 @@ import (
 	"time"
 )
 
-// urbandict json structs
 type APIResponse struct {
-        Results []Result `json:"list"`
-        Tags    []string `json:"tags"`
-        Type    string   `json:"result_type"`
+	Results []Result `json:"list"`
+	Tags    []string `json:"tags"`
+	Type    string   `json:"result_type"`
 }
 
 type Result struct {
-        Id         int32  `json:"defid"`
-        Author     string `json:"author"`
-        Definition string `json:"definition"`
-        Link       string `json:"permalink"`
-        ThumbsDown int32  `json:"thumbs_down"`
-        ThumbsUp   int32  `json:"thumbs_up"`
-        Word       string `json:"word"`
+	Id         int32  `json:"defid"`
+	Author     string `json:"author"`
+	Definition string `json:"definition"`
+	Link       string `json:"permalink"`
+	ThumbsDown int32  `json:"thumbs_down"`
+	ThumbsUp   int32  `json:"thumbs_up"`
+	Word       string `json:"word"`
 }
 
-func Urban(conn *irc.Connection, resp string, dword string) {
+func Urban(conn *irc.Connection) {
+	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
+		if strings.HasPrefix(event.Message(), "!urban ") == true {
 
-	response, err := DefineWord(dword)
+			var replyto string
 
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+			if strings.HasPrefix(event.Arguments[0], "#") {
+				replyto = event.Arguments[0]
+			} else {
+				replyto = event.Nick
+			}
 
-	if len(response.Results) <= 0 {
-		conn.Privmsg(resp, "not found")
-		return
-	}
+			query := strings.TrimPrefix(event.Message(), "!urban ")
+			response, err := DefineWord(query)
 
-	for _, def := range response.Results {
-		defResponse := fmt.Sprintf("%s", def.Definition)
-		s := strings.Split(string(defResponse), "\n")
-		lcount := 0
-		for _, line := range s {
-			if len(line) > 1 {
-				conn.Privmsgf(resp, line)
-				time.Sleep(300 * time.Millisecond)
-				lcount += 1
-				if lcount == 4 {
-					time.Sleep(2 * time.Second)
-					lcount = 0
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			if len(response.Results) <= 0 {
+				conn.Privmsg(replyto, "not found")
+				return
+			}
+
+			for _, def := range response.Results {
+				defResponse := fmt.Sprintf("%s", def.Definition)
+				s := strings.Split(string(defResponse), "\n")
+				lcount := 0
+				tcount := 0
+				for _, line := range s {
+					if len(line) > 1 {
+						conn.Privmsg(replyto, line)
+						time.Sleep(300 * time.Millisecond)
+						lcount += 1
+						if lcount == 4 {
+							time.Sleep(2 * time.Second)
+							tcount += lcount
+							lcount = 0
+						}
+						if tcount >= 40 {
+							break
+						}
+					}
 				}
 			}
 		}
-		break
-	}
+	})
 }
-
 func DefineWord(word string) (response *APIResponse, err error) {
 
 	s := url.QueryEscape(word)
@@ -81,4 +100,3 @@ func DefineWord(word string) (response *APIResponse, err error) {
 
 	return
 }
-
