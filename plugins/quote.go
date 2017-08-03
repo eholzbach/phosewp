@@ -91,8 +91,16 @@ func getQuote(db *sql.DB, id int) string {
 		}
 		rand.Seed(time.Now().Unix())
 		c, _ := strconv.Atoi(a)
-		b := rand.Intn(c-1) + 1
-		a = dbQuery(db, b)
+		if c >= 2 {
+			b := rand.Intn(c-1) + 1
+			a = dbQuery(db, b)
+			fmt.Println("random")
+		} else if c == 1 {
+			fmt.Println("one")
+			a = dbQuery(db, 1)
+		} else {
+			a = "no quotes"
+		}
 	}
 	return a
 }
