@@ -13,6 +13,8 @@ func Help(query string) string {
 		response = "string ; In lulz we trust"
 	case "dict":
 		response = "string ; Queries WordNet, a large lexical database of English"
+	case "quote":
+		response = "add string to save ; get [id] to fetch quote"
 	case "stock":
 		response = "string ; Stock price at previous day closing"
 	case "tide":
