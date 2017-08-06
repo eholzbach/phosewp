@@ -30,6 +30,7 @@ func main() {
 	plugins.FoaaS(conn)
 	plugins.Quote(conn)
 	plugins.Stocks(conn)
+	plugins.Tronald(conn)
 	plugins.Urban(conn)
 	plugins.Url(conn)
 	plugins.Weather(conn, wuapi)

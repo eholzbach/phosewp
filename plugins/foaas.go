@@ -28,7 +28,7 @@ type operators []struct {
 
 func FoaaS(conn *irc.Connection) {
 	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
-		if strings.HasPrefix(event.Message(), "!fo") == true {
+		if strings.HasPrefix(event.Message(), "!fu") == true {
 
 			var replyto string
 			var reply string
@@ -39,7 +39,7 @@ func FoaaS(conn *irc.Connection) {
 				replyto = event.Nick
 			}
 
-			name := strings.Trim(strings.TrimPrefix(event.Message(), "!fo"), " ")
+			name := strings.Trim(strings.TrimPrefix(event.Message(), "!fu"), " ")
 			if len(name) == 0 {
 				name = "0"
 			}
