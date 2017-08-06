@@ -27,6 +27,7 @@ func main() {
 	events.Global(conn, channels, handle, wuapi)
 
 	plugins.Dramatica(conn)
+	plugins.FoaaS(conn)
 	plugins.Quote(conn)
 	plugins.Stocks(conn)
 	plugins.Urban(conn)

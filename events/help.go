@@ -13,6 +13,8 @@ func Help(query string) string {
 		response = "string ; In lulz we trust"
 	case "dict":
 		response = "string ; Queries WordNet, a large lexical database of English"
+	case "fo":
+		response = "nil or string ; FoaaS"
 	case "quote":
 		response = "add string to save ; get [id] to fetch quote"
 	case "stock":
@@ -26,7 +28,7 @@ func Help(query string) string {
 	case "wiki":
 		response = "string ; Wikipedia"
 	default:
-		response = "Commands are: acronym, astronomy, drama, dict, stock, tide, urban, weather, wiki"
+		response = "Commands are: acronym, astronomy, drama, dict, fo, stock, tide, urban, weather, wiki"
 	}
 
 	return response
