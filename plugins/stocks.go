@@ -32,39 +32,35 @@ type Stock struct {
 	Open             float64 `json:"Open"`
 }
 
-func Stocks(conn *irc.Connection) {
-	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
-		if strings.HasPrefix(event.Message(), "!stock ") == true {
+func Stocks(conn *irc.Connection, event *irc.Event) {
 
-			var replyto string
+	var replyto string
 
-			if strings.HasPrefix(event.Arguments[0], "#") {
-				replyto = event.Arguments[0]
-			} else {
-				replyto = event.Nick
-			}
+	if strings.HasPrefix(event.Arguments[0], "#") {
+		replyto = event.Arguments[0]
+	} else {
+		replyto = event.Nick
+	}
 
-			query := strings.TrimPrefix(event.Message(), "!stock ")
+	query := strings.TrimPrefix(event.Message(), "!stock ")
 
-			endpoint := fmt.Sprintf("http://dev.markitondemand.com/Api/v2/Quote/json?symbol=%s", query)
-			r, err := http.Get(endpoint)
+	endpoint := fmt.Sprintf("http://dev.markitondemand.com/Api/v2/Quote/json?symbol=%s", query)
+	r, err := http.Get(endpoint)
 
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-			defer r.Body.Close()
-			var con Stock
-			json.NewDecoder(r.Body).Decode(&con)
+	defer r.Body.Close()
+	var con Stock
+	json.NewDecoder(r.Body).Decode(&con)
 
-			if len(con.Status) <= 0 {
-				conn.Privmsg(replyto, "not found")
-				return
-			}
-			s := fmt.Sprintf("%s: $%s, change $%s %s, high $%s, low $%s, %s", con.Name, strconv.FormatFloat(con.Lastprice, 'f', 2, 64), strconv.FormatFloat(con.Change, 'f', 2, 64), strconv.FormatFloat(con.Changepercent, 'f', 2, 64), strconv.FormatFloat(con.High, 'f', 2, 64), strconv.FormatFloat(con.Low, 'f', 2, 64), con.Timestamp)
-			conn.Privmsg(replyto, s)
-		}
+	if len(con.Status) <= 0 {
+		conn.Privmsg(replyto, "not found")
+		return
+	}
+	s := fmt.Sprintf("%s: $%s, change $%s %s, high $%s, low $%s, %s", con.Name, strconv.FormatFloat(con.Lastprice, 'f', 2, 64), strconv.FormatFloat(con.Change, 'f', 2, 64), strconv.FormatFloat(con.Changepercent, 'f', 2, 64), strconv.FormatFloat(con.High, 'f', 2, 64), strconv.FormatFloat(con.Low, 'f', 2, 64), con.Timestamp)
+	conn.Privmsg(replyto, s)
 
-	})
 }

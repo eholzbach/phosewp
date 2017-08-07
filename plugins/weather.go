@@ -184,134 +184,128 @@ type WeatherU struct {
 	} `json:"sun_phase"`
 }
 
-func Weather(conn *irc.Connection, wuapi string) {
-	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
-		if strings.HasPrefix(event.Message(), "!weather ") ||
-			strings.HasPrefix(event.Message(), "!astronomy ") ||
-			strings.HasPrefix(event.Message(), "!tide ") == true {
+func Weather(conn *irc.Connection, event *irc.Event, wuapi string) {
 
-			var replyto string
+	var replyto string
 
-			if strings.HasPrefix(event.Arguments[0], "#") {
-				replyto = event.Arguments[0]
-			} else {
-				replyto = event.Nick
-			}
+	if strings.HasPrefix(event.Arguments[0], "#") {
+		replyto = event.Arguments[0]
+	} else {
+		replyto = event.Nick
+	}
 
-			if len(wuapi) <= 1 {
-				fmt.Println("weather underground api key not found")
-				return
-			}
+	if len(wuapi) <= 1 {
+		fmt.Println("weather underground api key not found")
+		return
+	}
 
-			a := strings.Split(event.Message(), " ")
-			oper := strings.Replace(a[0], "!", "", -1)
-			query := a[1]
+	a := strings.Split(event.Message(), " ")
+	oper := strings.Replace(a[0], "!", "", -1)
+	query := a[1]
 
-			i := 0
-			for _, v := range query {
+	i := 0
+	for _, v := range query {
+		switch {
+		case v >= '0' && v <= '9':
+			i++
+		}
+	}
+	if i != 5 {
+		conn.Privmsg(replyto, fmt.Sprintf("%s only takes 5 digit zip codes", oper))
+		return
+	}
+
+	if oper == "weather" {
+		oper = "conditions"
+	}
+
+	endpoint := fmt.Sprintf("http://api.wunderground.com/api/%s/%s/q/%s.json", wuapi, oper, query)
+	r, err := http.Get(endpoint)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer r.Body.Close()
+	var con WeatherU
+	json.NewDecoder(r.Body).Decode(&con)
+
+	if len(con.Response.Error.Description) > 0 {
+		conn.Privmsg(replyto, con.Response.Error.Description)
+		return
+	}
+
+	var wind string
+	switch oper {
+	case "conditions":
+		humid := strings.Replace(con.CurrentObservation.RelativeHumidity, "%", "%%", -1)
+		temp := fmt.Sprintf("%s", strconv.FormatFloat(con.CurrentObservation.TempF, 'f', 1, 64))
+		wmph := strconv.FormatFloat(con.CurrentObservation.WindMph, 'f', 1, 64)
+		if len(con.CurrentObservation.WindGustMph) > 0 {
+			wind = fmt.Sprintf("wind from the %s at %s mph gusting to %s mph", con.CurrentObservation.WindDir, wmph, con.CurrentObservation.WindGustMph)
+		} else {
+			wind = fmt.Sprintf("wind from the %s at %s mph", con.CurrentObservation.WindDir, wmph)
+		}
+		s := fmt.Sprintf("%s, %s, humidity %s, temperature %s°F\n", con.CurrentObservation.Weather, wind, humid, temp)
+		conn.Privmsgf(replyto, s)
+	case "tide":
+		var o []string
+		var p []string
+		s, _ := strconv.ParseInt(con.Tide.Tidesummary[0].Date.Epoch, 10, 64)
+		t := time.Unix(s, 0)
+		u := t.AddDate(0, 0, 1)
+		o = append(o, t.Format("Mon 02")+"; ")
+
+		for _, v := range con.Tide.Tidesummary {
+			i, _ := strconv.Atoi(v.Date.Mday)
+			if t.Day() == i {
 				switch {
-				case v >= '0' && v <= '9':
-					i++
+				case strings.Contains(v.Data.Type, "High Tide"):
+					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
+					t := time.Unix(s, 0)
+					a := t.Format("3:04pm")
+					f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
+					o = append(o, f)
+				case strings.Contains(v.Data.Type, "Low Tide"):
+					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
+					t := time.Unix(s, 0)
+					a := t.Format("3:04pm")
+					f := fmt.Sprintf("L: %s @ %s ", v.Data.Height, a)
+					o = append(o, f)
 				}
-			}
-			if i != 5 {
-				conn.Privmsg(replyto, fmt.Sprintf("%s only takes 5 digit zip codes", oper))
-				return
-			}
-
-			if oper == "weather" {
-				oper = "conditions"
-			}
-
-			endpoint := fmt.Sprintf("http://api.wunderground.com/api/%s/%s/q/%s.json", wuapi, oper, query)
-			r, err := http.Get(endpoint)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			defer r.Body.Close()
-			var con WeatherU
-			json.NewDecoder(r.Body).Decode(&con)
-
-			if len(con.Response.Error.Description) > 0 {
-				conn.Privmsg(replyto, con.Response.Error.Description)
-				return
-			}
-
-			var wind string
-			switch oper {
-			case "conditions":
-				humid := strings.Replace(con.CurrentObservation.RelativeHumidity, "%", "%%", -1)
-				temp := fmt.Sprintf("%s", strconv.FormatFloat(con.CurrentObservation.TempF, 'f', 1, 64))
-				wmph := strconv.FormatFloat(con.CurrentObservation.WindMph, 'f', 1, 64)
-				if len(con.CurrentObservation.WindGustMph) > 0 {
-					wind = fmt.Sprintf("wind from the %s at %s mph gusting to %s mph", con.CurrentObservation.WindDir, wmph, con.CurrentObservation.WindGustMph)
-				} else {
-					wind = fmt.Sprintf("wind from the %s at %s mph", con.CurrentObservation.WindDir, wmph)
-				}
-				s := fmt.Sprintf("%s, %s, humidity %s, temperature %s°F\n", con.CurrentObservation.Weather, wind, humid, temp)
-				conn.Privmsgf(replyto, s)
-			case "tide":
-				var o []string
-				var p []string
-				s, _ := strconv.ParseInt(con.Tide.Tidesummary[0].Date.Epoch, 10, 64)
-				t := time.Unix(s, 0)
-				u := t.AddDate(0, 0, 1)
-				o = append(o, t.Format("Mon 02")+"; ")
-
-				for _, v := range con.Tide.Tidesummary {
-					i, _ := strconv.Atoi(v.Date.Mday)
-					if t.Day() == i {
-						switch {
-						case strings.Contains(v.Data.Type, "High Tide"):
-							s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
-							t := time.Unix(s, 0)
-							a := t.Format("3:04pm")
-							f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
-							o = append(o, f)
-						case strings.Contains(v.Data.Type, "Low Tide"):
-							s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
-							t := time.Unix(s, 0)
-							a := t.Format("3:04pm")
-							f := fmt.Sprintf("L: %s @ %s ", v.Data.Height, a)
-							o = append(o, f)
-						}
-					}
-				}
-
-				p = append(p, u.Format("Mon 02")+"; ")
-				for _, v := range con.Tide.Tidesummary {
-					i, _ := strconv.Atoi(v.Date.Mday)
-					if u.Day() == i {
-						switch {
-						case strings.Contains(v.Data.Type, "High Tide"):
-							s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
-							t := time.Unix(s, 0)
-							a := t.Format("3:04pm")
-							f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
-							p = append(p, f)
-						case strings.Contains(v.Data.Type, "Low Tide"):
-							s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
-							t := time.Unix(s, 0)
-							a := t.Format("3:04pm")
-							f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
-							p = append(p, f)
-						}
-					}
-				}
-
-				conn.Privmsg(replyto, strings.Join(o, ""))
-				time.Sleep(300 * time.Millisecond)
-				conn.Privmsg(replyto, strings.Join(p, ""))
-
-			case "astronomy":
-				sr := fmt.Sprintf("%s:%s", con.SunPhase.Sunrise.Hour, con.SunPhase.Sunrise.Minute)
-				ss := fmt.Sprintf("%s:%s", con.SunPhase.Sunset.Hour, con.SunPhase.Sunset.Minute)
-				s := fmt.Sprintf("Sunrise %s, sunset %s.", sr, ss)
-				m := fmt.Sprintf("Moonphase %s%s illuminated, age %s, in a %s phase.", con.MoonPhase.Percentilluminated, "%%", con.MoonPhase.Ageofmoon, strings.ToLower(con.MoonPhase.Phaseofmoon))
-				f := fmt.Sprintf("%s %s", s, m)
-				conn.Privmsg(replyto, f)
 			}
 		}
-	})
+
+		p = append(p, u.Format("Mon 02")+"; ")
+		for _, v := range con.Tide.Tidesummary {
+			i, _ := strconv.Atoi(v.Date.Mday)
+			if u.Day() == i {
+				switch {
+				case strings.Contains(v.Data.Type, "High Tide"):
+					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
+					t := time.Unix(s, 0)
+					a := t.Format("3:04pm")
+					f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
+					p = append(p, f)
+				case strings.Contains(v.Data.Type, "Low Tide"):
+					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
+					t := time.Unix(s, 0)
+					a := t.Format("3:04pm")
+					f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
+					p = append(p, f)
+				}
+			}
+		}
+
+		conn.Privmsg(replyto, strings.Join(o, ""))
+		time.Sleep(300 * time.Millisecond)
+		conn.Privmsg(replyto, strings.Join(p, ""))
+
+	case "astronomy":
+		sr := fmt.Sprintf("%s:%s", con.SunPhase.Sunrise.Hour, con.SunPhase.Sunrise.Minute)
+		ss := fmt.Sprintf("%s:%s", con.SunPhase.Sunset.Hour, con.SunPhase.Sunset.Minute)
+		s := fmt.Sprintf("Sunrise %s, sunset %s.", sr, ss)
+		m := fmt.Sprintf("Moonphase %s%s illuminated, age %s, in a %s phase.", con.MoonPhase.Percentilluminated, "%%", con.MoonPhase.Ageofmoon, strings.ToLower(con.MoonPhase.Phaseofmoon))
+		f := fmt.Sprintf("%s %s", s, m)
+		conn.Privmsg(replyto, f)
+	}
 }

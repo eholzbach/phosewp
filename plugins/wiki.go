@@ -49,72 +49,68 @@ type Qsearch struct {
 	} `json:"query"`
 }
 
-func Wiki(conn *irc.Connection) {
-	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
-		if strings.HasPrefix(event.Message(), "!wiki ") == true {
+func Wiki(conn *irc.Connection, event *irc.Event) {
 
-			var replyto string
+	var replyto string
 
-			if strings.HasPrefix(event.Arguments[0], "#") {
-				replyto = event.Arguments[0]
-			} else {
-				replyto = event.Nick
-			}
+	if strings.HasPrefix(event.Arguments[0], "#") {
+		replyto = event.Arguments[0]
+	} else {
+		replyto = event.Nick
+	}
 
-			query := strings.TrimPrefix(event.Message(), "!wiki ")
+	query := strings.TrimPrefix(event.Message(), "!wiki ")
 
-			w, err := mwclient.New("http://en.wikipedia.org/w/api.php", "dongs")
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
+	w, err := mwclient.New("http://en.wikipedia.org/w/api.php", "dongs")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-			s := params.Values{
-				"action":   "query",
-				"list":     "search",
-				"continue": "",
-				"srsearch": query,
-			}
+	s := params.Values{
+		"action":   "query",
+		"list":     "search",
+		"continue": "",
+		"srsearch": query,
+	}
 
-			sresp, err := w.GetRaw(s)
-			u := &Qsearch{}
-			if err := json.Unmarshal([]byte(sresp), &u); err != nil {
-				fmt.Println(err)
-				return
-			}
+	sresp, err := w.GetRaw(s)
+	u := &Qsearch{}
+	if err := json.Unmarshal([]byte(sresp), &u); err != nil {
+		fmt.Println(err)
+		return
+	}
 
-			if u.Query.Searchinfo.Totalhits == 0 {
-				conn.Privmsg(replyto, "not found")
-				return
-			}
+	if u.Query.Searchinfo.Totalhits == 0 {
+		conn.Privmsg(replyto, "not found")
+		return
+	}
 
-			t := u.Query.Search[0].Title
-			q := params.Values{
-				"action":      "query",
-				"format":      "json",
-				"redirects":   "",
-				"prop":        "extracts",
-				"exintro":     "",
-				"explaintext": "",
-				"titles":      t,
-			}
+	t := u.Query.Search[0].Title
+	q := params.Values{
+		"action":      "query",
+		"format":      "json",
+		"redirects":   "",
+		"prop":        "extracts",
+		"exintro":     "",
+		"explaintext": "",
+		"titles":      t,
+	}
 
-			v, err := w.GetRaw(q)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
+	v, err := w.GetRaw(q)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-			r := &Wresult{}
-			if err := json.Unmarshal([]byte(v), &r); err != nil {
-				fmt.Println(err)
-				return
-			}
+	r := &Wresult{}
+	if err := json.Unmarshal([]byte(v), &r); err != nil {
+		fmt.Println(err)
+		return
+	}
 
-			for _, p := range r.Query.Pages {
-				m := strings.Split(p.Extract, "\n")
-				conn.Privmsg(replyto, m[0])
-			}
-		}
-	})
+	for _, p := range r.Query.Pages {
+		m := strings.Split(p.Extract, "\n")
+		conn.Privmsg(replyto, m[0])
+	}
 }
