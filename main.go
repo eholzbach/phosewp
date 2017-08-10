@@ -24,18 +24,8 @@ func main() {
 		return
 	}
 
-	events.Global(conn, channels, handle, wuapi)
-
-	plugins.Dramatica(conn)
-	plugins.FoaaS(conn)
-	plugins.Quote(conn)
-	plugins.Stocks(conn)
-	plugins.Tronald(conn)
-	plugins.Urban(conn)
-	plugins.Url(conn)
-	plugins.Weather(conn, wuapi)
-	plugins.Wiki(conn)
-	plugins.Word(conn)
+	go events.Global(conn, channels, handle)
+	go plugins.Plugins(conn, channels, wuapi)
 
 	conn.Loop()
 }

@@ -1,8 +1,27 @@
-package events
+package plugins
 
-func Help(query string) string {
+import (
+	"github.com/thoj/go-ircevent"
+	"strings"
+)
 
+func Help(conn *irc.Connection, event *irc.Event) {
+
+	var query string
 	var response string
+	var replyto string
+
+	if strings.HasPrefix(event.Arguments[0], "#") {
+		replyto = event.Arguments[0]
+	} else {
+		replyto = event.Nick
+	}
+
+	a := strings.Split(event.Message(), " ")
+
+	if len(a) > 1 {
+		query = a[1]
+	}
 
 	switch query {
 	case "acronym":
@@ -23,7 +42,6 @@ func Help(query string) string {
 		response = "zip code ; Tidal information"
 	case "trump":
 		response = "string ; Tronald Dump"
-
 	case "urban":
 		response = "string ; Urban Dictionary"
 	case "weather":
@@ -34,6 +52,5 @@ func Help(query string) string {
 		response = "Commands are: acronym, astronomy, drama, dict, fu, stock, tide, trump, urban, weather, wiki"
 	}
 
-	return response
-
+	conn.Privmsg(replyto, response)
 }

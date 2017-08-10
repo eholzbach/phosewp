@@ -15,44 +15,40 @@ import (
 	"time"
 )
 
-func Quote(conn *irc.Connection) {
-	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
-		if strings.HasPrefix(event.Message(), "!quote") == true {
+func Quote(conn *irc.Connection, event *irc.Event) {
 
-			var replyto string
-			var reply string
+	var replyto string
+	var reply string
 
-			if strings.HasPrefix(event.Arguments[0], "#") {
-				replyto = event.Arguments[0]
-			} else {
-				replyto = event.Nick
-			}
+	if strings.HasPrefix(event.Arguments[0], "#") {
+		replyto = event.Arguments[0]
+	} else {
+		replyto = event.Nick
+	}
 
-			query := strings.Split(event.Message(), " ")
+	query := strings.Split(event.Message(), " ")
 
-			db, err := sql.Open("sqlite3", "./quotes.db")
-			checkError(err)
+	db, err := sql.Open("sqlite3", "./quotes.db")
+	checkError(err)
 
-			statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS quotes (quote TEXT)")
-			checkError(err)
-			statement.Exec()
-			if len(query) > 1 {
-				if query[1] == "add" && len(query) > 2 {
-					a := strings.TrimPrefix(event.Message(), "!quote add ")
-					b := addQuote(db, a)
-					reply = fmt.Sprintf("added, id: %s", b)
-				} else if query[1] != "add" && len(query) == 2 {
-					i, _ := strconv.Atoi(query[1])
-					reply = getQuote(db, i)
-				}
-			} else {
-				reply = getQuote(db, -0)
-			}
-
-			conn.Privmsg(replyto, reply)
+	statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS quotes (quote TEXT)")
+	checkError(err)
+	statement.Exec()
+	if len(query) > 1 {
+		if query[1] == "add" && len(query) > 2 {
+			a := strings.TrimPrefix(event.Message(), "!quote add ")
+			b := addQuote(db, a)
+			reply = fmt.Sprintf("added, id: %s", b)
+		} else if query[1] != "add" && len(query) == 2 {
+			i, _ := strconv.Atoi(query[1])
+			reply = getQuote(db, i)
 		}
+	} else {
+		reply = getQuote(db, -0)
+	}
 
-	})
+	conn.Privmsg(replyto, reply)
+
 }
 
 func checkError(err error) {

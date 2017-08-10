@@ -26,41 +26,37 @@ type operators []struct {
 	} `json:"fields"`
 }
 
-func FoaaS(conn *irc.Connection) {
-	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
-		if strings.HasPrefix(event.Message(), "!fu") == true {
+func FoaaS(conn *irc.Connection, event *irc.Event) {
 
-			var replyto string
-			var reply string
+	var replyto string
+	var reply string
 
-			if strings.HasPrefix(event.Arguments[0], "#") {
-				replyto = event.Arguments[0]
-			} else {
-				replyto = event.Nick
-			}
+	if strings.HasPrefix(event.Arguments[0], "#") {
+		replyto = event.Arguments[0]
+	} else {
+		replyto = event.Nick
+	}
 
-			name := strings.Trim(strings.TrimPrefix(event.Message(), "!fu"), " ")
-			if len(name) == 0 {
-				name = "0"
-			}
+	name := strings.Trim(strings.TrimPrefix(event.Message(), "!fu"), " ")
+	if len(name) == 0 {
+		name = "0"
+	}
 
-			getOps, err := http.Get("https://www.foaas.com/operations")
+	getOps, err := http.Get("https://www.foaas.com/operations")
 
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-			defer getOps.Body.Close()
-			con := operators{}
-			json.NewDecoder(getOps.Body).Decode(&con)
+	defer getOps.Body.Close()
+	con := operators{}
+	json.NewDecoder(getOps.Body).Decode(&con)
 
-			endpoint := randFoaas(con, name)
-			reply = getFoaas(endpoint, name)
+	endpoint := randFoaas(con, name)
+	reply = getFoaas(endpoint, name)
 
-			conn.Privmsg(replyto, reply)
-		}
-	})
+	conn.Privmsg(replyto, reply)
 }
 
 func getRand(count int) int {

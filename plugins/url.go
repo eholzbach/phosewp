@@ -13,35 +13,31 @@ import (
 	"strings"
 )
 
-func Url(conn *irc.Connection) {
-	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
-		if strings.Contains(event.Message(), "http://") || strings.Contains(event.Message(), "https://") {
+func Url(conn *irc.Connection, event *irc.Event) {
 
-			var replyto string
+	var replyto string
 
-			if strings.HasPrefix(event.Arguments[0], "#") {
-				replyto = event.Arguments[0]
-			} else {
-				replyto = event.Nick
+	if strings.HasPrefix(event.Arguments[0], "#") {
+		replyto = event.Arguments[0]
+	} else {
+		replyto = event.Nick
+	}
+
+	a := strings.Split(event.Message(), " ")
+	for _, b := range a {
+		if strings.HasPrefix(b, "http://") || strings.HasPrefix(b, "https://") {
+			response, err := http.Get(b)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			defer response.Body.Close()
+			if title, ok := GetTitle(response.Body); ok {
+				conn.Privmsg(replyto, title)
 			}
 
-			a := strings.Split(event.Message(), " ")
-			for _, b := range a {
-				if strings.HasPrefix(b, "http://") || strings.HasPrefix(b, "https://") {
-					response, err := http.Get(b)
-					if err != nil {
-						fmt.Println(err)
-						return
-					}
-					defer response.Body.Close()
-					if title, ok := GetTitle(response.Body); ok {
-						conn.Privmsg(replyto, title)
-					}
-
-				}
-			}
 		}
-	})
+	}
 }
 
 func GetTitle(r io.Reader) (string, bool) {

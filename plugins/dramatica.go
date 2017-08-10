@@ -42,113 +42,109 @@ type Edresult struct {
 	} `json:"query"`
 }
 
-func Dramatica(conn *irc.Connection) {
-	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
-		if strings.HasPrefix(event.Message(), "!drama ") == true {
+func Dramatica(conn *irc.Connection, event *irc.Event) {
 
-			var replyto string
+	var replyto string
 
-			if strings.HasPrefix(event.Arguments[0], "#") {
-				replyto = event.Arguments[0]
-			} else {
-				replyto = event.Nick
+	if strings.HasPrefix(event.Arguments[0], "#") {
+		replyto = event.Arguments[0]
+	} else {
+		replyto = event.Nick
+	}
+
+	w, err := mwclient.New("https://encyclopediadramatica.rs/api.php", "dongs")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	s := params.Values{
+		"action":   "query",
+		"list":     "search",
+		"continue": "",
+		"srsearch": strings.TrimPrefix(event.Message(), "!drama "),
+	}
+
+	sresp, err := w.GetRaw(s)
+	u := &Edsearch{}
+	if err := json.Unmarshal([]byte(sresp), &u); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if len(u.Query.Search) == 0 {
+		conn.Privmsg(replyto, "not found")
+		return
+	}
+
+	t := u.Query.Search[0].Title
+
+	a := params.Values{
+		"action":    "query",
+		"format":    "json",
+		"prop":      "revisions",
+		"rvprop":    "content",
+		"rvsection": "0",
+		"titles":    t,
+	}
+
+	rresp, err := w.GetRaw(a)
+	b := &Edresult{}
+	if err := json.Unmarshal([]byte(rresp), &b); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for _, p := range b.Query.Pages {
+		x := strings.Split(string(p.Revisions[0].Star), "\n")
+		for _, line := range x {
+			var str []string
+			var final []string
+
+			//cut out mediawiki links
+			a := strings.Split(line, " [[")
+			for _, v := range a {
+				if strings.Contains(v, "|") {
+					s := strings.Split(v, "|")
+					str = append(str, s[1])
+				} else {
+					str = append(str, v)
+				}
 			}
 
-			w, err := mwclient.New("https://encyclopediadramatica.rs/api.php", "dongs")
-			if err != nil {
-				fmt.Println(err)
-				return
+			for _, v := range str {
+				v = strings.Replace(v, "]", "", -1)
+				v = strings.Replace(v, "'''", "", -1)
+				v = sanitize.HTML(v)
+				final = append(final, v)
 			}
 
-			s := params.Values{
-				"action":   "query",
-				"list":     "search",
-				"continue": "",
-				"srsearch": strings.TrimPrefix(event.Message(), "!drama "),
-			}
-
-			sresp, err := w.GetRaw(s)
-			u := &Edsearch{}
-			if err := json.Unmarshal([]byte(sresp), &u); err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			if len(u.Query.Search) == 0 {
-				conn.Privmsg(replyto, "not found")
-				return
-			}
-
-			t := u.Query.Search[0].Title
-
-			a := params.Values{
-				"action":    "query",
-				"format":    "json",
-				"prop":      "revisions",
-				"rvprop":    "content",
-				"rvsection": "0",
-				"titles":    t,
-			}
-
-			rresp, err := w.GetRaw(a)
-			b := &Edresult{}
-			if err := json.Unmarshal([]byte(rresp), &b); err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			for _, p := range b.Query.Pages {
-				x := strings.Split(string(p.Revisions[0].Star), "\n")
-				for _, line := range x {
-					var str []string
-					var final []string
-
-					//cut out mediawiki links
-					a := strings.Split(line, " [[")
-					for _, v := range a {
-						if strings.Contains(v, "|") {
-							s := strings.Split(v, "|")
-							str = append(str, s[1])
-						} else {
-							str = append(str, v)
-						}
+			z := strings.Join(final, " ")
+			q := strings.Split(z, "\n")
+			lcount := 0
+			tcount := 0
+			for _, line := range q {
+				if len(line) <= 0 {
+				} else {
+					if len(line) >= 430 {
+						a := []rune(line)
+						conn.Privmsg(replyto, string(a[:430]))
+						time.Sleep(300 * time.Millisecond)
+						conn.Privmsg(replyto, string(a[430:]))
+						lcount += 2
+					} else {
+						conn.Privmsg(replyto, line)
+						lcount += 1
 					}
-
-					for _, v := range str {
-						v = strings.Replace(v, "]", "", -1)
-						v = strings.Replace(v, "'''", "", -1)
-						v = sanitize.HTML(v)
-						final = append(final, v)
+					if lcount == 4 {
+						time.Sleep(2 * time.Second)
+						lcount = 0
 					}
-
-					z := strings.Join(final, " ")
-					q := strings.Split(z, "\n")
-					lcount := 0
-					tcount := 0
-					for _, line := range q {
-						if len(line) <= 0 {
-						} else {
-							if len(line) >= 430 {
-								a := []rune(line)
-								conn.Privmsg(replyto, string(a[:430]))
-								time.Sleep(300 * time.Millisecond)
-								conn.Privmsg(replyto, string(a[430:]))
-								lcount += 2
-							} else {
-								conn.Privmsg(replyto, line)
-								lcount += 1
-							}
-							if lcount == 4 {
-								time.Sleep(2 * time.Second)
-								lcount = 0
-							}
-							if tcount >= 40 {
-								break
-							}
-						}
+					if tcount >= 40 {
+						break
 					}
 				}
 			}
 		}
-	})
+	}
 }

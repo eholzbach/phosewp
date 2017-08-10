@@ -40,31 +40,26 @@ type Dump struct {
 	} `json:"_embedded"`
 }
 
-func Tronald(conn *irc.Connection) {
-	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
-		if strings.HasPrefix(event.Message(), "!trump") == true {
+func Tronald(conn *irc.Connection, event *irc.Event) {
 
-			var replyto string
+	var replyto string
 
-			if strings.HasPrefix(event.Arguments[0], "#") {
-				replyto = event.Arguments[0]
-			} else {
-				replyto = event.Nick
-			}
+	if strings.HasPrefix(event.Arguments[0], "#") {
+		replyto = event.Arguments[0]
+	} else {
+		replyto = event.Nick
+	}
 
-			r, err := http.Get("https://api.tronalddump.io/random/quote")
+	r, err := http.Get("https://api.tronalddump.io/random/quote")
 
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-			defer r.Body.Close()
-			var con Dump
-			json.NewDecoder(r.Body).Decode(&con)
+	defer r.Body.Close()
+	var con Dump
+	json.NewDecoder(r.Body).Decode(&con)
 
-			conn.Privmsg(replyto, con.Value)
-		}
-
-	})
+	conn.Privmsg(replyto, con.Value)
 }
