@@ -188,19 +188,25 @@ func Weather(conn *irc.Connection, event *irc.Event, wuapi string) {
 
 	var replyto string
 
+	if len(wuapi) <= 1 {
+		fmt.Println("weather underground api key not found")
+		return
+	}
+
 	if strings.HasPrefix(event.Arguments[0], "#") {
 		replyto = event.Arguments[0]
 	} else {
 		replyto = event.Nick
 	}
 
-	if len(wuapi) <= 1 {
-		fmt.Println("weather underground api key not found")
+	a := strings.Split(event.Message(), " ")
+	oper := strings.Replace(a[0], "!", "", -1)
+
+	if len(a) != 2 {
+		conn.Privmsg(replyto, fmt.Sprintf("%s only takes 5 digit zip codes", oper))
 		return
 	}
 
-	a := strings.Split(event.Message(), " ")
-	oper := strings.Replace(a[0], "!", "", -1)
 	query := a[1]
 
 	i := 0
