@@ -33,6 +33,8 @@ func Url(conn *irc.Connection, event *irc.Event) {
 			}
 			defer response.Body.Close()
 			if title, ok := GetTitle(response.Body); ok {
+				title = strings.Replace(title, "\n", "", -1)
+				title = strings.TrimSpace(title)
 				conn.Privmsg(replyto, title)
 			}
 
