@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func Plugins(conn *irc.Connection, channels []string, wuapi string) {
+func Plugins(conn *irc.Connection, channels []string, wuapi string, newsapi string) {
 	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
 		query := strings.Split(event.Message(), " ")
 		switch query[0] {
@@ -22,6 +22,8 @@ func Plugins(conn *irc.Connection, channels []string, wuapi string) {
 			FoaaS(conn, event)
 		case "!help":
 			Help(conn, event)
+		case "!news":
+			News(conn, event, newsapi)
 		case "!quote":
 			Quote(conn, event)
 		case "!stock":

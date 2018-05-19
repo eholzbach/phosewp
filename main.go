@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	network, ssl, handle, channels, wuapi := config.Config()
+	network, ssl, handle, channels, wuapi, newsapi := config.Config()
 
 	fmt.Printf("connecting bot...\n")
 
@@ -25,7 +25,7 @@ func main() {
 	}
 
 	go events.Global(conn, channels, handle)
-	go plugins.Plugins(conn, channels, wuapi)
+	go plugins.Plugins(conn, channels, wuapi, newsapi)
 
 	conn.Loop()
 }

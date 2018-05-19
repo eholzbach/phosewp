@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func Config() (string, bool, string, []string, string) {
+func Config() (string, bool, string, []string, string, string) {
 
 	viper.SetConfigName("phosewp")
 	viper.SetConfigName(".phosewp")
@@ -32,5 +32,5 @@ func Config() (string, bool, string, []string, string) {
 
 	}
 
-	return viper.GetString("network"), viper.GetBool("ssl"), viper.GetString("handle"), n, viper.GetString("wuapi")
+	return viper.GetString("network"), viper.GetBool("ssl"), viper.GetString("handle"), n, viper.GetString("wuapi"), viper.GetString("newsapi")
 }

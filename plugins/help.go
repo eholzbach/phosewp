@@ -34,6 +34,8 @@ func Help(conn *irc.Connection, event *irc.Event) {
 		response = "string ; Queries WordNet, a large lexical database of English"
 	case "fu":
 		response = "nil or string ; FoaaS"
+	case "news":
+		response = "nil or string ; Prints a recent article title from random garbage news source"
 	case "quote":
 		response = "add string to save ; get [id] to fetch quote"
 	case "stock":
@@ -49,7 +51,7 @@ func Help(conn *irc.Connection, event *irc.Event) {
 	case "wiki":
 		response = "string ; Wikipedia"
 	default:
-		response = "Commands are: acronym, astronomy, drama, dict, fu, stock, tide, trump, urban, weather, wiki"
+		response = "Commands are: acronym, astronomy, drama, dict, fu, news, stock, tide, trump, urban, weather, wiki"
 	}
 
 	conn.Privmsg(replyto, response)
