@@ -38,7 +38,7 @@ func breitButt(event *irc.Event, token string) string {
 	url := "https://newsapi.org/v2"
 
 	// try top headlines from a random source
-	r := rand.New(rand.NewSource(time.Now().Unix()))
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	msg := strings.Split(event.Message(), " ")
 	var endpoint string
 

@@ -60,7 +60,7 @@ func FoaaS(conn *irc.Connection, event *irc.Event) {
 }
 
 func getRand(count int) int {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixNano())
 	a := rand.Intn(count-1) + 1
 	return a
 }

@@ -85,7 +85,7 @@ func getQuote(db *sql.DB, id int) string {
 			checkError(err)
 			a = q
 		}
-		rand.Seed(time.Now().Unix())
+		rand.Seed(time.Now().UnixNano())
 		c, _ := strconv.Atoi(a)
 		if c >= 2 {
 			b := rand.Intn(c-1) + 1
