@@ -32,5 +32,5 @@ func Config() (string, bool, string, []string, string, string) {
 
 	}
 
-	return viper.GetString("network"), viper.GetBool("ssl"), viper.GetString("handle"), n, viper.GetString("wuapi"), viper.GetString("newsapi")
+	return viper.GetString("network"), viper.GetBool("ssl"), viper.GetString("handle"), n, viper.GetString("darksky"), viper.GetString("newsapi")
 }

@@ -14,5 +14,5 @@ ssl: true
 handle: g1mpb0t
 channels:
   - #leetbotz
-wuapi: api_key
+darksky: api_key
 ```

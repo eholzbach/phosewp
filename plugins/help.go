@@ -26,8 +26,6 @@ func Help(conn *irc.Connection, event *irc.Event) {
 	switch query {
 	case "acronym":
 		response = "string ; V.E.R.A. -- Virtual Entity of Relevant Acronyms"
-	case "astronomy":
-		response = "zip code ; Returns the moon phase, sunrise and sunset times"
 	case "drama":
 		response = "string ; In lulz we trust"
 	case "dict":
@@ -40,8 +38,6 @@ func Help(conn *irc.Connection, event *irc.Event) {
 		response = "add string to save ; get [id] to fetch quote"
 	case "stock":
 		response = "string ; Stock price at previous day closing"
-	case "tide":
-		response = "zip code ; Tidal information"
 	case "trump":
 		response = "string ; Tronald Dump"
 	case "urban":

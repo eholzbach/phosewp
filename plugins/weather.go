@@ -1,7 +1,4 @@
-/*
-  Weather underground requires an api key. This was the only single source of
-  environment data I could find.
-*/
+// dark sky
 
 package plugins
 
@@ -15,181 +12,132 @@ import (
 	"time"
 )
 
-type WeatherU struct {
-	Response struct {
-		Version        string `json:"version"`
-		Termsofservice string `json:"termsofService"`
-		Features       struct {
-			Conditions int `json:"conditions"`
-			Tide       int `json:"tide"`
-			Astronomy  int `json:"astronomy"`
-		} `json:"features"`
-		Error struct {
-			Type        string `json:"type"`
-			Description string `json:"description"`
-		} `json:"error"`
-	} `json:"response"`
-	CurrentObservation struct {
-		Image struct {
-			URL   string `json:"url"`
-			Title string `json:"title"`
-			Link  string `json:"link"`
-		} `json:"image"`
-		DisplayLocation struct {
-			Full           string `json:"full"`
-			City           string `json:"city"`
-			State          string `json:"state"`
-			StateName      string `json:"state_name"`
-			Country        string `json:"country"`
-			CountryIso3166 string `json:"country_iso3166"`
-			Zip            string `json:"zip"`
-			Magic          string `json:"magic"`
-			Wmo            string `json:"wmo"`
-			Latitude       string `json:"latitude"`
-			Longitude      string `json:"longitude"`
-			Elevation      string `json:"elevation"`
-		} `json:"display_location"`
-		ObservationLocation struct {
-			Full           string `json:"full"`
-			City           string `json:"city"`
-			State          string `json:"state"`
-			Country        string `json:"country"`
-			CountryIso3166 string `json:"country_iso3166"`
-			Latitude       string `json:"latitude"`
-			Longitude      string `json:"longitude"`
-			Elevation      string `json:"elevation"`
-		} `json:"observation_location"`
-		Estimated struct {
-		} `json:"estimated"`
-		StationID             string  `json:"station_id"`
-		ObservationTime       string  `json:"observation_time"`
-		ObservationTimeRfc822 string  `json:"observation_time_rfc822"`
-		ObservationEpoch      string  `json:"observation_epoch"`
-		LocalTimeRfc822       string  `json:"local_time_rfc822"`
-		LocalEpoch            string  `json:"local_epoch"`
-		LocalTzShort          string  `json:"local_tz_short"`
-		LocalTzLong           string  `json:"local_tz_long"`
-		LocalTzOffset         string  `json:"local_tz_offset"`
-		Weather               string  `json:"weather"`
-		TemperatureString     string  `json:"temperature_string"`
-		TempF                 float64 `json:"temp_f"`
-		TempC                 float64 `json:"temp_c"`
-		RelativeHumidity      string  `json:"relative_humidity"`
-		WindString            string  `json:"wind_string"`
-		WindDir               string  `json:"wind_dir"`
-		WindDegrees           int     `json:"wind_degrees"`
-		WindMph               float64 `json:"wind_mph"`
-		WindGustMph           string  `json:"wind_gust_mph"`
-		WindKph               float64 `json:"wind_kph"`
-		WindGustKph           string  `json:"wind_gust_kph"`
-		PressureMb            string  `json:"pressure_mb"`
-		PressureIn            string  `json:"pressure_in"`
-		PressureTrend         string  `json:"pressure_trend"`
-		DewpointString        string  `json:"dewpoint_string"`
-		DewpointF             int     `json:"dewpoint_f"`
-		DewpointC             int     `json:"dewpoint_c"`
-		HeatIndexString       string  `json:"heat_index_string"`
-		HeatIndexF            string  `json:"heat_index_f"`
-		HeatIndexC            string  `json:"heat_index_c"`
-		WindchillString       string  `json:"windchill_string"`
-		WindchillF            string  `json:"windchill_f"`
-		WindchillC            string  `json:"windchill_c"`
-		FeelslikeString       string  `json:"feelslike_string"`
-		FeelslikeF            string  `json:"feelslike_f"`
-		FeelslikeC            string  `json:"feelslike_c"`
-		VisibilityMi          string  `json:"visibility_mi"`
-		VisibilityKm          string  `json:"visibility_km"`
-		Solarradiation        string  `json:"solarradiation"`
-		Uv                    string  `json:"UV"`
-		Precip1HrString       string  `json:"precip_1hr_string"`
-		Precip1HrIn           string  `json:"precip_1hr_in"`
-		Precip1HrMetric       string  `json:"precip_1hr_metric"`
-		PrecipTodayString     string  `json:"precip_today_string"`
-		PrecipTodayIn         string  `json:"precip_today_in"`
-		PrecipTodayMetric     string  `json:"precip_today_metric"`
-		Icon                  string  `json:"icon"`
-		IconURL               string  `json:"icon_url"`
-		ForecastURL           string  `json:"forecast_url"`
-		HistoryURL            string  `json:"history_url"`
-		ObURL                 string  `json:"ob_url"`
-		Nowcast               string  `json:"nowcast"`
-	} `json:"current_observation"`
-	Tide struct {
-		Tideinfo []struct {
-			Tidesite string `json:"tideSite"`
-			Lat      string `json:"lat"`
-			Lon      string `json:"lon"`
-			Units    string `json:"units"`
-			Type     string `json:"type"`
-			Tzname   string `json:"tzname"`
-		} `json:"tideInfo"`
-		Tidesummary []struct {
-			Date struct {
-				Pretty string `json:"pretty"`
-				Year   string `json:"year"`
-				Mon    string `json:"mon"`
-				Mday   string `json:"mday"`
-				Hour   string `json:"hour"`
-				Min    string `json:"min"`
-				Tzname string `json:"tzname"`
-				Epoch  string `json:"epoch"`
-			} `json:"date"`
-			Utcdate struct {
-				Pretty string `json:"pretty"`
-				Year   string `json:"year"`
-				Mon    string `json:"mon"`
-				Mday   string `json:"mday"`
-				Hour   string `json:"hour"`
-				Min    string `json:"min"`
-				Tzname string `json:"tzname"`
-				Epoch  string `json:"epoch"`
-			} `json:"utcdate"`
-			Data struct {
-				Height string `json:"height"`
-				Type   string `json:"type"`
-			} `json:"data"`
-		} `json:"tideSummary"`
-		Tidesummarystats []struct {
-			Maxheight float64 `json:"maxheight"`
-			Minheight float64 `json:"minheight"`
-		} `json:"tideSummaryStats"`
-	} `json:"tide"`
-	MoonPhase struct {
-		Percentilluminated string `json:"percentIlluminated"`
-		Ageofmoon          string `json:"ageOfMoon"`
-		Phaseofmoon        string `json:"phaseofMoon"`
-		Hemisphere         string `json:"hemisphere"`
-		CurrentTime        struct {
-			Hour   string `json:"hour"`
-			Minute string `json:"minute"`
-		} `json:"current_time"`
-		Sunrise struct {
-			Hour   string `json:"hour"`
-			Minute string `json:"minute"`
-		} `json:"sunrise"`
-		Sunset struct {
-			Hour   string `json:"hour"`
-			Minute string `json:"minute"`
-		} `json:"sunset"`
-	} `json:"moon_phase"`
-	SunPhase struct {
-		Sunrise struct {
-			Hour   string `json:"hour"`
-			Minute string `json:"minute"`
-		} `json:"sunrise"`
-		Sunset struct {
-			Hour   string `json:"hour"`
-			Minute string `json:"minute"`
-		} `json:"sunset"`
-	} `json:"sun_phase"`
+type Zipcodes struct {
+	Data []struct {
+		Zipcode   string `json:"zipcode"`
+		Latitude  string `json:"latitude"`
+		Longitude string `json:"longitude"`
+	} `json:"data"`
 }
 
-func Weather(conn *irc.Connection, event *irc.Event, wuapi string) {
+type Forcast struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Timezone  string  `json:"timezone"`
+	Currently struct {
+		Time                 int     `json:"time"`
+		Summary              string  `json:"summary"`
+		Icon                 string  `json:"icon"`
+		NearestStormDistance int     `json:"nearestStormDistance"`
+		NearestStormBearing  int     `json:"nearestStormBearing"`
+		PrecipIntensity      int     `json:"precipIntensity"`
+		PrecipProbability    int     `json:"precipProbability"`
+		Temperature          float64 `json:"temperature"`
+		ApparentTemperature  float64 `json:"apparentTemperature"`
+		DewPoint             float64 `json:"dewPoint"`
+		Humidity             float64 `json:"humidity"`
+		Pressure             float64 `json:"pressure"`
+		WindSpeed            float64 `json:"windSpeed"`
+		WindGust             float64 `json:"windGust"`
+		WindBearing          int     `json:"windBearing"`
+		CloudCover           float64 `json:"cloudCover"`
+		UvIndex              int     `json:"uvIndex"`
+		Visibility           float64 `json:"visibility"`
+		Ozone                float64 `json:"ozone"`
+	} `json:"currently"`
+	Minutely struct {
+		Summary string `json:"summary"`
+		Icon    string `json:"icon"`
+		Data    []struct {
+			Time              int `json:"time"`
+			PrecipIntensity   int `json:"precipIntensity"`
+			PrecipProbability int `json:"precipProbability"`
+		} `json:"data"`
+	} `json:"minutely"`
+	Hourly struct {
+		Summary string `json:"summary"`
+		Icon    string `json:"icon"`
+		Data    []struct {
+			Time                int     `json:"time"`
+			Summary             string  `json:"summary"`
+			Icon                string  `json:"icon"`
+			PrecipIntensity     int     `json:"precipIntensity"`
+			PrecipProbability   int     `json:"precipProbability"`
+			Temperature         float64 `json:"temperature"`
+			ApparentTemperature float64 `json:"apparentTemperature"`
+			DewPoint            float64 `json:"dewPoint"`
+			Humidity            float64 `json:"humidity"`
+			Pressure            float64 `json:"pressure"`
+			WindSpeed           float64 `json:"windSpeed"`
+			WindGust            float64 `json:"windGust"`
+			WindBearing         int     `json:"windBearing"`
+			CloudCover          int     `json:"cloudCover"`
+			UvIndex             int     `json:"uvIndex"`
+			Visibility          float64 `json:"visibility"`
+			Ozone               float64 `json:"ozone"`
+			PrecipType          string  `json:"precipType,omitempty"`
+			PrecipAccumulation  float64 `json:"precipAccumulation,omitempty"`
+		} `json:"data"`
+	} `json:"hourly"`
+	Daily struct {
+		Summary string `json:"summary"`
+		Icon    string `json:"icon"`
+		Data    []struct {
+			Time                        int     `json:"time"`
+			Summary                     string  `json:"summary"`
+			Icon                        string  `json:"icon"`
+			SunriseTime                 int     `json:"sunriseTime"`
+			SunsetTime                  int     `json:"sunsetTime"`
+			MoonPhase                   float64 `json:"moonPhase"`
+			PrecipIntensity             float64 `json:"precipIntensity"`
+			PrecipIntensityMax          float64 `json:"precipIntensityMax"`
+			PrecipIntensityMaxTime      int     `json:"precipIntensityMaxTime"`
+			PrecipProbability           float64 `json:"precipProbability"`
+			PrecipType                  string  `json:"precipType"`
+			TemperatureHigh             float64 `json:"temperatureHigh"`
+			TemperatureHighTime         int     `json:"temperatureHighTime"`
+			TemperatureLow              float64 `json:"temperatureLow"`
+			TemperatureLowTime          int     `json:"temperatureLowTime"`
+			ApparentTemperatureHigh     float64 `json:"apparentTemperatureHigh"`
+			ApparentTemperatureHighTime int     `json:"apparentTemperatureHighTime"`
+			ApparentTemperatureLow      float64 `json:"apparentTemperatureLow"`
+			ApparentTemperatureLowTime  int     `json:"apparentTemperatureLowTime"`
+			DewPoint                    float64 `json:"dewPoint"`
+			Humidity                    float64 `json:"humidity"`
+			Pressure                    float64 `json:"pressure"`
+			WindSpeed                   float64 `json:"windSpeed"`
+			WindGust                    float64 `json:"windGust"`
+			WindGustTime                int     `json:"windGustTime"`
+			WindBearing                 int     `json:"windBearing"`
+			CloudCover                  float64 `json:"cloudCover"`
+			UvIndex                     int     `json:"uvIndex"`
+			UvIndexTime                 int     `json:"uvIndexTime"`
+			Visibility                  float64 `json:"visibility"`
+			Ozone                       float64 `json:"ozone"`
+			TemperatureMin              float64 `json:"temperatureMin"`
+			TemperatureMinTime          int     `json:"temperatureMinTime"`
+			TemperatureMax              float64 `json:"temperatureMax"`
+			TemperatureMaxTime          int     `json:"temperatureMaxTime"`
+			ApparentTemperatureMin      float64 `json:"apparentTemperatureMin"`
+			ApparentTemperatureMinTime  int     `json:"apparentTemperatureMinTime"`
+			ApparentTemperatureMax      float64 `json:"apparentTemperatureMax"`
+			ApparentTemperatureMaxTime  int     `json:"apparentTemperatureMaxTime"`
+		} `json:"data"`
+	} `json:"daily"`
+	Flags struct {
+		Sources        []string `json:"sources"`
+		NearestStation float64  `json:"nearest-station"`
+		Units          string   `json:"units"`
+	} `json:"flags"`
+	Offset int `json:"offset"`
+}
+
+func Weather(conn *irc.Connection, event *irc.Event, darksky string) {
 
 	var replyto string
 
-	if len(wuapi) <= 1 {
-		fmt.Println("weather underground api key not found")
+	if len(darksky) <= 1 {
+		fmt.Println("dark sky api key not found")
 		return
 	}
 
@@ -200,7 +148,6 @@ func Weather(conn *irc.Connection, event *irc.Event, wuapi string) {
 	}
 
 	a := strings.Split(event.Message(), " ")
-	oper := strings.Replace(a[0], "!", "", -1)
 
 	if len(a) != 2 {
 		conn.Privmsg(replyto, fmt.Sprintf("%s only takes 5 digit zip codes", oper))
@@ -221,18 +168,14 @@ func Weather(conn *irc.Connection, event *irc.Event, wuapi string) {
 		return
 	}
 
-	if oper == "weather" {
-		oper = "conditions"
-	}
-
-	endpoint := fmt.Sprintf("http://api.wunderground.com/api/%s/%s/q/%s.json", wuapi, oper, query)
+	endpoint := fmt.Sprintf("https://api.darksky.net/forecast/%s/", darksky, latitude, longitude)
 	r, err := http.Get(endpoint)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	defer r.Body.Close()
-	var con WeatherU
+	var con Forcast
 	json.NewDecoder(r.Body).Decode(&con)
 
 	if len(con.Response.Error.Description) > 0 {
@@ -240,78 +183,8 @@ func Weather(conn *irc.Connection, event *irc.Event, wuapi string) {
 		return
 	}
 
-	var wind string
-	switch oper {
-	case "conditions":
-		humid := strings.Replace(con.CurrentObservation.RelativeHumidity, "%", "%%", -1)
-		temp := fmt.Sprintf("%s", strconv.FormatFloat(con.CurrentObservation.TempF, 'f', 1, 64))
-		wmph := strconv.FormatFloat(con.CurrentObservation.WindMph, 'f', 1, 64)
-		if len(con.CurrentObservation.WindGustMph) > 0 {
-			wind = fmt.Sprintf("wind from the %s at %s mph gusting to %s mph", con.CurrentObservation.WindDir, wmph, con.CurrentObservation.WindGustMph)
-		} else {
-			wind = fmt.Sprintf("wind from the %s at %s mph", con.CurrentObservation.WindDir, wmph)
-		}
-		s := fmt.Sprintf("%s, %s, humidity %s, temperature %s°F\n", con.CurrentObservation.Weather, wind, humid, temp)
-		conn.Privmsgf(replyto, s)
-	case "tide":
-		var o []string
-		var p []string
-		s, _ := strconv.ParseInt(con.Tide.Tidesummary[0].Date.Epoch, 10, 64)
-		t := time.Unix(s, 0)
-		u := t.AddDate(0, 0, 1)
-		o = append(o, t.Format("Mon 02")+"; ")
+}
 
-		for _, v := range con.Tide.Tidesummary {
-			i, _ := strconv.Atoi(v.Date.Mday)
-			if t.Day() == i {
-				switch {
-				case strings.Contains(v.Data.Type, "High Tide"):
-					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
-					t := time.Unix(s, 0)
-					a := t.Format("3:04pm")
-					f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
-					o = append(o, f)
-				case strings.Contains(v.Data.Type, "Low Tide"):
-					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
-					t := time.Unix(s, 0)
-					a := t.Format("3:04pm")
-					f := fmt.Sprintf("L: %s @ %s ", v.Data.Height, a)
-					o = append(o, f)
-				}
-			}
-		}
+func getCoordinates() {
 
-		p = append(p, u.Format("Mon 02")+"; ")
-		for _, v := range con.Tide.Tidesummary {
-			i, _ := strconv.Atoi(v.Date.Mday)
-			if u.Day() == i {
-				switch {
-				case strings.Contains(v.Data.Type, "High Tide"):
-					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
-					t := time.Unix(s, 0)
-					a := t.Format("3:04pm")
-					f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
-					p = append(p, f)
-				case strings.Contains(v.Data.Type, "Low Tide"):
-					s, _ := strconv.ParseInt(v.Date.Epoch, 10, 64)
-					t := time.Unix(s, 0)
-					a := t.Format("3:04pm")
-					f := fmt.Sprintf("H: %s @ %s ", v.Data.Height, a)
-					p = append(p, f)
-				}
-			}
-		}
-
-		conn.Privmsg(replyto, strings.Join(o, ""))
-		time.Sleep(300 * time.Millisecond)
-		conn.Privmsg(replyto, strings.Join(p, ""))
-
-	case "astronomy":
-		sr := fmt.Sprintf("%s:%s", con.SunPhase.Sunrise.Hour, con.SunPhase.Sunrise.Minute)
-		ss := fmt.Sprintf("%s:%s", con.SunPhase.Sunset.Hour, con.SunPhase.Sunset.Minute)
-		s := fmt.Sprintf("Sunrise %s, sunset %s.", sr, ss)
-		m := fmt.Sprintf("Moonphase %s%s illuminated, age %s, in a %s phase.", con.MoonPhase.Percentilluminated, "%%", con.MoonPhase.Ageofmoon, strings.ToLower(con.MoonPhase.Phaseofmoon))
-		f := fmt.Sprintf("%s %s", s, m)
-		conn.Privmsg(replyto, f)
-	}
 }
