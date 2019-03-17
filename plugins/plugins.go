@@ -5,15 +5,13 @@ import (
 	"strings"
 )
 
-func Plugins(conn *irc.Connection, channels []string, wuapi string, newsapi string) {
+func Plugins(conn *irc.Connection, channels []string, darksky string, newsapi string) {
 	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
 		query := strings.Split(event.Message(), " ")
 		switch query[0] {
 
 		case "!acronym":
 			Dict(conn, event)
-		case "!astronomy":
-			Weather(conn, event, wuapi)
 		case "!drama":
 			Dramatica(conn, event)
 		case "!dict":
@@ -28,14 +26,12 @@ func Plugins(conn *irc.Connection, channels []string, wuapi string, newsapi stri
 			Quote(conn, event)
 		case "!stock":
 			Stocks(conn, event)
-		case "!tide":
-			Weather(conn, event, wuapi)
 		case "!trump":
 			Tronald(conn, event)
 		case "!urban":
 			Urban(conn, event)
 		case "!weather":
-			Weather(conn, event, wuapi)
+			Weather(conn, event, darksky)
 		case "!wiki":
 			Wiki(conn, event)
 		default:
