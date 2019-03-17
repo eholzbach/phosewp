@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
+	"os"
 	"strings"
 )
 
@@ -16,7 +18,8 @@ func Config() (string, bool, string, []string, string, string) {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(err)
+		fmt.Println("config file not found, exiting")
+		os.Exit(1)
 	}
 
 	viper.WatchConfig()

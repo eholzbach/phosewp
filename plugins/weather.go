@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"github.com/thoj/go-ircevent"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type Zipcodes struct {
@@ -149,26 +149,20 @@ func Weather(conn *irc.Connection, event *irc.Event, darksky string) {
 
 	a := strings.Split(event.Message(), " ")
 
-	if len(a) != 2 {
-		conn.Privmsg(replyto, fmt.Sprintf("%s only takes 5 digit zip codes", oper))
+	if !validInput(a) {
+		conn.Privmsg(replyto, fmt.Sprintf("weather only accepts 5 digit zip codes"))
 		return
 	}
 
-	query := a[1]
-
-	i := 0
-	for _, v := range query {
-		switch {
-		case v >= '0' && v <= '9':
-			i++
-		}
-	}
-	if i != 5 {
-		conn.Privmsg(replyto, fmt.Sprintf("%s only takes 5 digit zip codes", oper))
+	file, err := os.Open("zipcodes.json")
+	if err != nil {
+		conn.Privmsg(replyto, fmt.Sprintf("zipcode data not found"))
 		return
 	}
 
-	endpoint := fmt.Sprintf("https://api.darksky.net/forecast/%s/", darksky, latitude, longitude)
+	latitude, longitude := getCoordinates(a[1], file)
+
+	endpoint := fmt.Sprintf("https://api.darksky.net/forecast/%s/%s,%s", darksky, latitude, longitude)
 	r, err := http.Get(endpoint)
 	if err != nil {
 		fmt.Println(err)
@@ -178,13 +172,45 @@ func Weather(conn *irc.Connection, event *irc.Event, darksky string) {
 	var con Forcast
 	json.NewDecoder(r.Body).Decode(&con)
 
-	if len(con.Response.Error.Description) > 0 {
-		conn.Privmsg(replyto, con.Response.Error.Description)
-		return
-	}
-
+	humidity := strconv.FormatFloat(con.Currently.Humidity, 'f', 2, 64)[2:]
+	b := fmt.Sprintf("%s, Wind %.0f mph, Humidity %s%%, Temperature %.0f°", con.Currently.Summary, con.Currently.WindSpeed, humidity, con.Currently.Temperature)
+	conn.Privmsg(replyto, b)
+	return
 }
 
-func getCoordinates() {
+func validInput(a []string) bool {
+	if len(a) != 2 {
+		return false
+	}
 
+	i := 0
+	for _, v := range a[1] {
+		switch {
+		case v >= '0' && v <= '9':
+			i++
+		}
+	}
+
+	if i != 5 {
+		return false
+	}
+
+	return true
+}
+
+func getCoordinates(query string, file *os.File) (string, string) {
+	var z *Zipcodes
+	err := json.NewDecoder(file).Decode(&z)
+
+	if err != nil {
+		return "21.343331", "-157.941721"
+	}
+
+	for _, v := range z.Data {
+		if v.Zipcode == query {
+			return v.Latitude, v.Longitude
+		}
+	}
+
+	return "21.343331", "-157.941721"
 }
