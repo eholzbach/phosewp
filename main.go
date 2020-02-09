@@ -10,22 +10,22 @@ import (
 
 func main() {
 
-	network, ssl, handle, channels, darksky, newsapi := config.Config()
+	conf := config.Config()
 
 	fmt.Printf("connecting bot...\n")
 
-	conn := irc.IRC(handle, handle)
-	conn.UseTLS = ssl
+	conn := irc.IRC(conf.Handle, conf.Handle)
+	conn.UseTLS = conf.Ssl
 
-	err := conn.Connect(network)
+	err := conn.Connect(conf.Network)
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Error creating connection: %s\n", err)
 		return
 	}
 
-	go events.Global(conn, channels, handle)
-	go plugins.Plugins(conn, channels, darksky, newsapi)
+	go events.Global(conn, conf)
+	go plugins.Plugins(conn, conf)
 
 	conn.Loop()
 }

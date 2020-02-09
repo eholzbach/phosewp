@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func Quote(conn *irc.Connection, event *irc.Event) {
+func Quote(conn *irc.Connection, event *irc.Event, dbfile string) {
 
 	var replyto string
 	var reply string
@@ -28,7 +28,7 @@ func Quote(conn *irc.Connection, event *irc.Event) {
 
 	query := strings.Split(event.Message(), " ")
 
-	db, err := sql.Open("sqlite3", "./quotes.db")
+	db, err := sql.Open("sqlite3", dbfile)
 	checkError(err)
 
 	statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS quotes (quote TEXT)")

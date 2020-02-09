@@ -2,14 +2,15 @@ package events
 
 import (
 	"fmt"
+	"github.com/eholzbach/phosewp/config"
 	"github.com/thoj/go-ircevent"
 	"strings"
 )
 
-func Global(conn *irc.Connection, channels []string, handle string) {
+func Global(conn *irc.Connection, conf *config.ConfigVars) {
 
 	conn.AddCallback("001", func(event *irc.Event) {
-		for _, channel := range channels {
+		for _, channel := range conf.Channels {
 			conn.Join(channel)
 		}
 	})
@@ -23,7 +24,7 @@ func Global(conn *irc.Connection, channels []string, handle string) {
 	})
 
 	conn.AddCallback("KICK", func(event *irc.Event) {
-		if event.Arguments[1] == handle {
+		if event.Arguments[1] == conf.Handle {
 			conn.Join(event.Arguments[0])
 			s := fmt.Sprint("eat a bag of dicks, ", event.Nick, ".")
 			conn.Privmsg(event.Arguments[0], s)

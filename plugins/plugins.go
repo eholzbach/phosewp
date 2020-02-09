@@ -1,11 +1,12 @@
 package plugins
 
 import (
+	"github.com/eholzbach/phosewp/config"
 	"github.com/thoj/go-ircevent"
 	"strings"
 )
 
-func Plugins(conn *irc.Connection, channels []string, darksky string, newsapi string) {
+func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
 		query := strings.Split(event.Message(), " ")
 		switch query[0] {
@@ -21,9 +22,9 @@ func Plugins(conn *irc.Connection, channels []string, darksky string, newsapi st
 		case "!help":
 			Help(conn, event)
 		case "!news":
-			News(conn, event, newsapi)
+			News(conn, event, conf.Newsapi)
 		case "!quote":
-			Quote(conn, event)
+			Quote(conn, event, conf.Dbfile)
 		case "!stock":
 			Stocks(conn, event)
 		case "!trump":
@@ -31,7 +32,7 @@ func Plugins(conn *irc.Connection, channels []string, darksky string, newsapi st
 		case "!urban":
 			Urban(conn, event)
 		case "!weather":
-			Weather(conn, event, darksky)
+			Weather(conn, event, conf.Darksky)
 		case "!wiki":
 			Wiki(conn, event)
 		default:

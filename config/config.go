@@ -4,11 +4,19 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"os"
-	"strings"
 )
 
-func Config() (string, bool, string, []string, string, string) {
+type ConfigVars struct {
+	Network  string
+	Ssl      bool
+	Handle   string
+	Channels []string
+	Darksky  string
+	Dbfile   string
+	Newsapi  string
+}
 
+func Config() *ConfigVars {
 	viper.SetConfigName("phosewp")
 	viper.SetConfigName(".phosewp")
 	viper.AddConfigPath("/etc/")
@@ -24,16 +32,15 @@ func Config() (string, bool, string, []string, string, string) {
 
 	viper.WatchConfig()
 
-	c := viper.GetStringSlice("channels")
-	n := c[:0]
-	for _, v := range c {
-		if strings.HasPrefix(v, "#") == false {
-			v = "#" + v
-		}
-
-		n = append(n, v)
-
+	a := &ConfigVars{
+		Network:  viper.GetString("network"),
+		Ssl:      viper.GetBool("ssl"),
+		Handle:   viper.GetString("handle"),
+		Channels: viper.GetStringSlice("channels"),
+		Darksky:  viper.GetString("darksky"),
+		Dbfile:   viper.GetString("dbfile"),
+		Newsapi:  viper.GetString("newsapi"),
 	}
 
-	return viper.GetString("network"), viper.GetBool("ssl"), viper.GetString("handle"), n, viper.GetString("darksky"), viper.GetString("newsapi")
+	return a
 }
