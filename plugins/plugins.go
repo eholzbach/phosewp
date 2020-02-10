@@ -27,8 +27,6 @@ func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 		switch query[0] {
 		case "!acronym":
 			Dict(conn, r, event)
-		case "!drama":
-			Dramatica(conn, r, event)
 		case "!dict":
 			Dict(conn, r, event)
 		case "!fu":

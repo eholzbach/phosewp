@@ -1,7 +1,3 @@
-/*
-  Queries markitondemand for last close price. Typical for unauthenticated api's.
-*/
-
 package plugins
 
 import (
@@ -32,6 +28,7 @@ type Stock struct {
 	Open             float64 `json:"Open"`
 }
 
+// Stocks queries markitondemand for last close price.
 func Stocks(conn *irc.Connection, r string, event *irc.Event) {
 
 	query := strings.TrimPrefix(event.Message(), "!stock ")

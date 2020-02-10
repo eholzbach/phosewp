@@ -1,5 +1,3 @@
-// Wikipedia is Trumps favorite FAKE NEWS
-
 package plugins
 
 import (
@@ -49,6 +47,7 @@ type Qsearch struct {
 	} `json:"query"`
 }
 
+// Wiki spams with the first paragraph from wikipedia
 func Wiki(conn *irc.Connection, r string, event *irc.Event) {
 	query := strings.TrimPrefix(event.Message(), "!wiki ")
 

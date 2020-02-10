@@ -39,6 +39,7 @@ type Dump struct {
 	} `json:"_embedded"`
 }
 
+// Tronald pukes quotes from a garbage person
 func Tronald(conn *irc.Connection, r string, event *irc.Event) {
 
 	a, err := http.Get("https://api.tronalddump.io/random/quote")

@@ -27,6 +27,7 @@ type fakeNews struct {
 	} `json:"articles"`
 }
 
+// breitButt provides lolwuts?
 func breitButt(event *irc.Event, token string) string {
 
 	sources := []string{
@@ -91,6 +92,7 @@ func breitButt(event *irc.Event, token string) string {
 	return "no articles found"
 }
 
+// News provides garbage titles from garbage sources
 func News(conn *irc.Connection, r string, event *irc.Event, token string) {
 
 	if len(token) <= 1 {

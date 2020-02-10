@@ -1,3 +1,4 @@
+// Package config returns the configuration data
 package config
 
 import (
@@ -16,6 +17,7 @@ type ConfigVars struct {
 	Newsapi  string
 }
 
+// Config reads the configuration file and returns a struct of data
 func Config() *ConfigVars {
 	viper.SetConfigName("phosewp")
 	viper.SetConfigName(".phosewp")

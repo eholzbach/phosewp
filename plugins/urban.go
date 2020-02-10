@@ -1,5 +1,3 @@
-//  Not worthwhile yet not worthless.
-
 package plugins
 
 import (
@@ -28,6 +26,7 @@ type Result struct {
 	Word       string `json:"word"`
 }
 
+// Urban provides garbage from urban dict
 func Urban(conn *irc.Connection, r string, event *irc.Event) {
 	query := strings.TrimPrefix(event.Message(), "!urban ")
 	response, err := DefineWord(query)
@@ -64,6 +63,8 @@ func Urban(conn *irc.Connection, r string, event *irc.Event) {
 		}
 	}
 }
+
+// DefineWord looks up a word on urban dict
 func DefineWord(word string) (response *APIResponse, err error) {
 
 	s := url.QueryEscape(word)

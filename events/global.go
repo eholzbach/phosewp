@@ -1,3 +1,4 @@
+// Package events runs global event routines
 package events
 
 import (
@@ -7,6 +8,7 @@ import (
 	"strings"
 )
 
+// Global event watcher
 func Global(conn *irc.Connection, conf *config.ConfigVars) {
 
 	conn.AddCallback("001", func(event *irc.Event) {

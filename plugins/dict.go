@@ -1,6 +1,3 @@
-//  Queries dict.org using RFC2229. The world before RESTful api's was awful.
-//  This module survives because the service does not require authentication.
-
 package plugins
 
 import (
@@ -11,8 +8,8 @@ import (
 	"time"
 )
 
+//  Dict queries dict.org using RFC2229. The world before RESTful api's was awful.
 func Dict(conn *irc.Connection, r string, event *irc.Event) {
-
 	var db string
 	var query string
 

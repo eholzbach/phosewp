@@ -1,5 +1,3 @@
-// dark sky
-
 package plugins
 
 import (
@@ -132,6 +130,7 @@ type Forcast struct {
 	Offset int `json:"offset"`
 }
 
+// Weather returns a forcast summary from Darksky
 func Weather(conn *irc.Connection, r string, event *irc.Event, darksky string) {
 	if len(darksky) <= 1 {
 		fmt.Println("dark sky api key not found")
@@ -169,6 +168,7 @@ func Weather(conn *irc.Connection, r string, event *irc.Event, darksky string) {
 	return
 }
 
+// validInput validates the entry is a zip code
 func validInput(a []string) bool {
 	if len(a) != 2 {
 		return false
@@ -189,6 +189,7 @@ func validInput(a []string) bool {
 	return true
 }
 
+// getCoordinates resolves estimated gps coorinates from a zipcode
 func getCoordinates(query string, file *os.File) (string, string) {
 	var z *Zipcodes
 	err := json.NewDecoder(file).Decode(&z)

@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Help provides basic usage instructions
 func Help(conn *irc.Connection, r string, event *irc.Event) {
 
 	var query string
@@ -19,8 +20,6 @@ func Help(conn *irc.Connection, r string, event *irc.Event) {
 	switch query {
 	case "acronym":
 		response = "string ; V.E.R.A. -- Virtual Entity of Relevant Acronyms"
-	case "drama":
-		response = "string ; In lulz we trust"
 	case "dict":
 		response = "string ; Queries WordNet, a large lexical database of English"
 	case "fu":
