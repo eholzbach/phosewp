@@ -42,15 +42,7 @@ type Edresult struct {
 	} `json:"query"`
 }
 
-func Dramatica(conn *irc.Connection, event *irc.Event) {
-
-	var replyto string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
+func Dramatica(conn *irc.Connection, r string, event *irc.Event) {
 
 	w, err := mwclient.New("https://encyclopediadramatica.rs/api.php", "dongs")
 	if err != nil {
@@ -73,7 +65,7 @@ func Dramatica(conn *irc.Connection, event *irc.Event) {
 	}
 
 	if len(u.Query.Search) == 0 {
-		conn.Privmsg(replyto, "not found")
+		conn.Privmsg(r, "not found")
 		return
 	}
 
@@ -128,12 +120,12 @@ func Dramatica(conn *irc.Connection, event *irc.Event) {
 				} else {
 					if len(line) >= 430 {
 						a := []rune(line)
-						conn.Privmsg(replyto, string(a[:430]))
+						conn.Privmsg(r, string(a[:430]))
 						time.Sleep(300 * time.Millisecond)
-						conn.Privmsg(replyto, string(a[430:]))
+						conn.Privmsg(r, string(a[430:]))
 						lcount += 2
 					} else {
-						conn.Privmsg(replyto, line)
+						conn.Privmsg(r, line)
 						lcount += 1
 					}
 					if lcount == 4 {

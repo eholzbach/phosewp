@@ -49,16 +49,7 @@ type Qsearch struct {
 	} `json:"query"`
 }
 
-func Wiki(conn *irc.Connection, event *irc.Event) {
-
-	var replyto string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
-
+func Wiki(conn *irc.Connection, r string, event *irc.Event) {
 	query := strings.TrimPrefix(event.Message(), "!wiki ")
 
 	w, err := mwclient.New("http://en.wikipedia.org/w/api.php", "dongs")
@@ -82,7 +73,7 @@ func Wiki(conn *irc.Connection, event *irc.Event) {
 	}
 
 	if u.Query.Searchinfo.Totalhits == 0 {
-		conn.Privmsg(replyto, "not found")
+		conn.Privmsg(r, "not found")
 		return
 	}
 
@@ -103,14 +94,14 @@ func Wiki(conn *irc.Connection, event *irc.Event) {
 		return
 	}
 
-	r := &Wresult{}
-	if err := json.Unmarshal([]byte(v), &r); err != nil {
+	ru := &Wresult{}
+	if err := json.Unmarshal([]byte(v), &ru); err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	for _, p := range r.Query.Pages {
+	for _, p := range ru.Query.Pages {
 		m := strings.Split(p.Extract, "\n")
-		conn.Privmsg(replyto, m[0])
+		conn.Privmsg(r, m[0])
 	}
 }

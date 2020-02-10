@@ -1,6 +1,4 @@
-/*
-  shitpost title parser
-*/
+//  shitpost title parser
 
 package plugins
 
@@ -13,16 +11,7 @@ import (
 	"strings"
 )
 
-func Url(conn *irc.Connection, event *irc.Event) {
-
-	var replyto string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
-
+func Url(conn *irc.Connection, r string, event *irc.Event) {
 	a := strings.Split(event.Message(), " ")
 	for _, b := range a {
 		if strings.HasPrefix(b, "http://") || strings.HasPrefix(b, "https://") {
@@ -35,7 +24,7 @@ func Url(conn *irc.Connection, event *irc.Event) {
 			if title, ok := GetTitle(response.Body); ok {
 				title = strings.Replace(title, "\n", "", -1)
 				title = strings.TrimSpace(title)
-				conn.Privmsg(replyto, title)
+				conn.Privmsg(r, title)
 			}
 
 		}

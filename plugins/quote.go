@@ -15,16 +15,8 @@ import (
 	"time"
 )
 
-func Quote(conn *irc.Connection, event *irc.Event, dbfile string) {
-
-	var replyto string
+func Quote(conn *irc.Connection, r string, event *irc.Event, dbfile string) {
 	var reply string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
 
 	query := strings.Split(event.Message(), " ")
 
@@ -47,7 +39,7 @@ func Quote(conn *irc.Connection, event *irc.Event, dbfile string) {
 		reply = getQuote(db, -0)
 	}
 
-	conn.Privmsg(replyto, reply)
+	conn.Privmsg(r, reply)
 
 }
 

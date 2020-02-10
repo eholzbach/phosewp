@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/thoj/go-ircevent"
 	"net/http"
-	"strings"
 )
 
 type Dump struct {
@@ -40,26 +39,18 @@ type Dump struct {
 	} `json:"_embedded"`
 }
 
-func Tronald(conn *irc.Connection, event *irc.Event) {
+func Tronald(conn *irc.Connection, r string, event *irc.Event) {
 
-	var replyto string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
-
-	r, err := http.Get("https://api.tronalddump.io/random/quote")
+	a, err := http.Get("https://api.tronalddump.io/random/quote")
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	defer r.Body.Close()
+	defer a.Body.Close()
 	var con Dump
-	json.NewDecoder(r.Body).Decode(&con)
+	json.NewDecoder(a.Body).Decode(&con)
 
-	conn.Privmsg(replyto, con.Value)
+	conn.Privmsg(r, con.Value)
 }

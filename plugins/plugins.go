@@ -1,3 +1,4 @@
+// Package plugins is the main handler for all plugins available
 package plugins
 
 import (
@@ -6,40 +7,53 @@ import (
 	"strings"
 )
 
+// Plugins function handles routing to all plugins
 func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
-		query := strings.Split(event.Message(), " ")
-		switch query[0] {
+		// reply target
+		var r string
 
+		if strings.HasPrefix(event.Arguments[0], "#") {
+			// channel
+			r = event.Arguments[0]
+		} else {
+			// user
+			r = event.Nick
+		}
+
+		// get event prefix
+		query := strings.Split(event.Message(), " ")
+
+		switch query[0] {
 		case "!acronym":
-			Dict(conn, event)
+			Dict(conn, r, event)
 		case "!drama":
-			Dramatica(conn, event)
+			Dramatica(conn, r, event)
 		case "!dict":
-			Dict(conn, event)
+			Dict(conn, r, event)
 		case "!fu":
-			FoaaS(conn, event)
+			FoaaS(conn, r, event)
 		case "!help":
-			Help(conn, event)
+			Help(conn, r, event)
 		case "!news":
-			News(conn, event, conf.Newsapi)
+			News(conn, r, event, conf.Newsapi)
 		case "!quote":
-			Quote(conn, event, conf.Dbfile)
+			Quote(conn, r, event, conf.Dbfile)
 		case "!stock":
-			Stocks(conn, event)
+			Stocks(conn, r, event)
 		case "!trump":
-			Tronald(conn, event)
+			Tronald(conn, r, event)
 		case "!urban":
-			Urban(conn, event)
+			Urban(conn, r, event)
 		case "!weather":
-			Weather(conn, event, conf.Darksky)
+			Weather(conn, r, event, conf.Darksky)
 		case "!wiki":
-			Wiki(conn, event)
+			Wiki(conn, r, event)
 		default:
 		}
 
 		if strings.Contains(event.Message(), "http://") || strings.Contains(event.Message(), "https://") {
-			Url(conn, event)
+			Url(conn, r, event)
 		}
 	})
 }

@@ -26,16 +26,8 @@ type operators []struct {
 	} `json:"fields"`
 }
 
-func FoaaS(conn *irc.Connection, event *irc.Event) {
-
-	var replyto string
+func FoaaS(conn *irc.Connection, r string, event *irc.Event) {
 	var reply string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
 
 	name := strings.Trim(strings.TrimPrefix(event.Message(), "!fu"), " ")
 	if len(name) == 0 {
@@ -56,7 +48,7 @@ func FoaaS(conn *irc.Connection, event *irc.Event) {
 	endpoint := randFoaas(con, name)
 	reply = getFoaas(endpoint, name)
 
-	conn.Privmsg(replyto, reply)
+	conn.Privmsg(r, reply)
 }
 
 func getRand(count int) int {

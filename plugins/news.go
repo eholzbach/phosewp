@@ -91,21 +91,13 @@ func breitButt(event *irc.Event, token string) string {
 	return "no articles found"
 }
 
-func News(conn *irc.Connection, event *irc.Event, token string) {
+func News(conn *irc.Connection, r string, event *irc.Event, token string) {
 
 	if len(token) <= 1 {
 		fmt.Println("newsapi key not found")
 		return
 	}
 
-	var replyto string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
-
 	line := breitButt(event, token)
-	conn.Privmsg(replyto, line)
+	conn.Privmsg(r, line)
 }

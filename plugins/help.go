@@ -5,17 +5,10 @@ import (
 	"strings"
 )
 
-func Help(conn *irc.Connection, event *irc.Event) {
+func Help(conn *irc.Connection, r string, event *irc.Event) {
 
 	var query string
 	var response string
-	var replyto string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
 
 	a := strings.Split(event.Message(), " ")
 
@@ -50,5 +43,5 @@ func Help(conn *irc.Connection, event *irc.Event) {
 		response = "Commands are: acronym, drama, dict, fu, news, stock, trump, urban, weather, wiki"
 	}
 
-	conn.Privmsg(replyto, response)
+	conn.Privmsg(r, response)
 }

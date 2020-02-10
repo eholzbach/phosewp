@@ -1,6 +1,4 @@
-/*
-  Not worthwhile yet not worthless.
-*/
+//  Not worthwhile yet not worthless.
 
 package plugins
 
@@ -30,16 +28,7 @@ type Result struct {
 	Word       string `json:"word"`
 }
 
-func Urban(conn *irc.Connection, event *irc.Event) {
-
-	var replyto string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
-
+func Urban(conn *irc.Connection, r string, event *irc.Event) {
 	query := strings.TrimPrefix(event.Message(), "!urban ")
 	response, err := DefineWord(query)
 
@@ -49,7 +38,7 @@ func Urban(conn *irc.Connection, event *irc.Event) {
 	}
 
 	if len(response.Results) <= 0 {
-		conn.Privmsg(replyto, "not found")
+		conn.Privmsg(r, "not found")
 		return
 	}
 
@@ -60,7 +49,7 @@ func Urban(conn *irc.Connection, event *irc.Event) {
 		tcount := 0
 		for _, line := range s {
 			if len(line) > 1 {
-				conn.Privmsg(replyto, line)
+				conn.Privmsg(r, line)
 				time.Sleep(300 * time.Millisecond)
 				lcount += 1
 				if lcount == 4 {
