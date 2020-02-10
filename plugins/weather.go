@@ -3,6 +3,7 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/eholzbach/phosewp/config"
 	"github.com/thoj/go-ircevent"
 	"net/http"
 	"os"
@@ -131,8 +132,8 @@ type Forcast struct {
 }
 
 // Weather returns a forcast summary from Darksky
-func Weather(conn *irc.Connection, r string, event *irc.Event, darksky string) {
-	if len(darksky) <= 1 {
+func Weather(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+	if len(conf.Darksky) <= 1 {
 		fmt.Println("dark sky api key not found")
 		return
 	}
@@ -144,7 +145,7 @@ func Weather(conn *irc.Connection, r string, event *irc.Event, darksky string) {
 		return
 	}
 
-	file, err := os.Open("zipcodes.json")
+	file, err := os.Open(conf.Zipcodes)
 	if err != nil {
 		conn.Privmsg(r, fmt.Sprintf("zipcode data not found"))
 		return
@@ -152,7 +153,7 @@ func Weather(conn *irc.Connection, r string, event *irc.Event, darksky string) {
 
 	latitude, longitude := getCoordinates(a[1], file)
 
-	endpoint := fmt.Sprintf("https://api.darksky.net/forecast/%s/%s,%s", darksky, latitude, longitude)
+	endpoint := fmt.Sprintf("https://api.darksky.net/forecast/%s/%s,%s", conf.Darksky, latitude, longitude)
 	resp, err := http.Get(endpoint)
 	if err != nil {
 		fmt.Println(err)

@@ -3,6 +3,7 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/eholzbach/phosewp/config"
 	"github.com/thoj/go-ircevent"
 	"math/rand"
 	"net/http"
@@ -93,13 +94,12 @@ func breitButt(event *irc.Event, token string) string {
 }
 
 // News provides garbage titles from garbage sources
-func News(conn *irc.Connection, r string, event *irc.Event, token string) {
-
-	if len(token) <= 1 {
+func News(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+	if len(conf.Newsapi) <= 1 {
 		fmt.Println("newsapi key not found")
 		return
 	}
 
-	line := breitButt(event, token)
+	line := breitButt(event, conf.Newsapi)
 	conn.Privmsg(r, line)
 }

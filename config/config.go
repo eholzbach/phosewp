@@ -13,6 +13,7 @@ type ConfigVars struct {
 	Handle   string
 	Channels []string
 	Darksky  string
+	Zipcodes string
 	Dbfile   string
 	Newsapi  string
 }
@@ -40,6 +41,7 @@ func Config() *ConfigVars {
 		Handle:   viper.GetString("handle"),
 		Channels: viper.GetStringSlice("channels"),
 		Darksky:  viper.GetString("darksky"),
+		Zipcodes: viper.GetString("zipcodes"),
 		Dbfile:   viper.GetString("dbfile"),
 		Newsapi:  viper.GetString("newsapi"),
 	}

@@ -3,6 +3,7 @@ package plugins
 import (
 	"database/sql"
 	"fmt"
+	"github.com/eholzbach/phosewp/config"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/thoj/go-ircevent"
 	"math/rand"
@@ -12,12 +13,12 @@ import (
 )
 
 // Quote saves and recalls shame
-func Quote(conn *irc.Connection, r string, event *irc.Event, dbfile string) {
+func Quote(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
 	var reply string
 
 	query := strings.Split(event.Message(), " ")
 
-	db, err := sql.Open("sqlite3", dbfile)
+	db, err := sql.Open("sqlite3", conf.Dbfile)
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -34,9 +34,9 @@ func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 		case "!help":
 			Help(conn, r, event)
 		case "!news":
-			News(conn, r, event, conf.Newsapi)
+			News(conn, r, event, conf)
 		case "!quote":
-			Quote(conn, r, event, conf.Dbfile)
+			Quote(conn, r, event, conf)
 		case "!stock":
 			Stocks(conn, r, event)
 		case "!trump":
@@ -44,7 +44,7 @@ func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 		case "!urban":
 			Urban(conn, r, event)
 		case "!weather":
-			Weather(conn, r, event, conf.Darksky)
+			Weather(conn, r, event, conf)
 		case "!wiki":
 			Wiki(conn, r, event)
 		default:
