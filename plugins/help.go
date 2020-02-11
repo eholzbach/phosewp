@@ -18,8 +18,10 @@ func Help(conn *irc.Connection, r string, event *irc.Event) {
 	}
 
 	switch query {
+	case "bs":
+		response = "string ; Corporate bullshit generator"
 	case "dict":
-		response = "string ; Queries a dictionary."
+		response = "string ; Queries a dictionary"
 	case "fu":
 		response = "nil or string ; FoaaS"
 	case "news":

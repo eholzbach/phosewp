@@ -25,6 +25,8 @@ func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 		query := strings.Split(event.Message(), " ")
 
 		switch query[0] {
+		case "!bs":
+			Bs(conn, r, event)
 		case "!dict":
 			Dict(conn, r, event, conf)
 		case "!fu":
