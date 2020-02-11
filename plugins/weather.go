@@ -1,10 +1,9 @@
-// dark sky
-
 package plugins
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/eholzbach/phosewp/config"
 	"github.com/thoj/go-ircevent"
 	"net/http"
 	"os"
@@ -132,52 +131,45 @@ type Forcast struct {
 	Offset int `json:"offset"`
 }
 
-func Weather(conn *irc.Connection, event *irc.Event, darksky string) {
-
-	var replyto string
-
-	if len(darksky) <= 1 {
+// Weather returns a forcast summary from Darksky
+func Weather(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+	if len(conf.Darksky) <= 1 {
 		fmt.Println("dark sky api key not found")
 		return
-	}
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
 	}
 
 	a := strings.Split(event.Message(), " ")
 
 	if !validInput(a) {
-		conn.Privmsg(replyto, fmt.Sprintf("weather only accepts 5 digit zip codes"))
+		conn.Privmsg(r, fmt.Sprintf("weather only accepts 5 digit zip codes"))
 		return
 	}
 
-	file, err := os.Open("zipcodes.json")
+	file, err := os.Open(conf.Zipcodes)
 	if err != nil {
-		conn.Privmsg(replyto, fmt.Sprintf("zipcode data not found"))
+		conn.Privmsg(r, fmt.Sprintf("zipcode data not found"))
 		return
 	}
 
 	latitude, longitude := getCoordinates(a[1], file)
 
-	endpoint := fmt.Sprintf("https://api.darksky.net/forecast/%s/%s,%s", darksky, latitude, longitude)
-	r, err := http.Get(endpoint)
+	endpoint := fmt.Sprintf("https://api.darksky.net/forecast/%s/%s,%s", conf.Darksky, latitude, longitude)
+	resp, err := http.Get(endpoint)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	defer r.Body.Close()
+	defer resp.Body.Close()
 	var con Forcast
-	json.NewDecoder(r.Body).Decode(&con)
+	json.NewDecoder(resp.Body).Decode(&con)
 
 	humidity := strconv.FormatFloat(con.Currently.Humidity, 'f', 2, 64)[2:]
 	b := fmt.Sprintf("%s, Wind %.0f mph, Humidity %s%%, Temperature %.0f°", con.Currently.Summary, con.Currently.WindSpeed, humidity, con.Currently.Temperature)
-	conn.Privmsg(replyto, b)
+	conn.Privmsg(r, b)
 	return
 }
 
+// validInput validates the entry is a zip code
 func validInput(a []string) bool {
 	if len(a) != 2 {
 		return false
@@ -198,6 +190,7 @@ func validInput(a []string) bool {
 	return true
 }
 
+// getCoordinates resolves estimated gps coorinates from a zipcode
 func getCoordinates(query string, file *os.File) (string, string) {
 	var z *Zipcodes
 	err := json.NewDecoder(file).Decode(&z)

@@ -1,5 +1,3 @@
-// FoaaS
-
 package plugins
 
 import (
@@ -26,16 +24,9 @@ type operators []struct {
 	} `json:"fields"`
 }
 
-func FoaaS(conn *irc.Connection, event *irc.Event) {
-
-	var replyto string
+// Foaas provides you with a joyful fuck off as a service
+func FoaaS(conn *irc.Connection, r string, event *irc.Event) {
 	var reply string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
 
 	name := strings.Trim(strings.TrimPrefix(event.Message(), "!fu"), " ")
 	if len(name) == 0 {
@@ -56,15 +47,17 @@ func FoaaS(conn *irc.Connection, event *irc.Event) {
 	endpoint := randFoaas(con, name)
 	reply = getFoaas(endpoint, name)
 
-	conn.Privmsg(replyto, reply)
+	conn.Privmsg(r, reply)
 }
 
+// getRand provides a mildly random number
 func getRand(count int) int {
 	rand.Seed(time.Now().UnixNano())
 	a := rand.Intn(count-1) + 1
 	return a
 }
 
+// getFoaas gets a fuck to give
 func getFoaas(endpoint string, name string) string {
 	var b string
 	var url string
@@ -104,6 +97,7 @@ func getFoaas(endpoint string, name string) string {
 	return b
 }
 
+// randFoaas gets a random fuck to give
 func randFoaas(con operators, name string) string {
 	var a int
 	var b []string

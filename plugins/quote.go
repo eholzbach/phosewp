@@ -1,12 +1,9 @@
-/* save and fetch quotes
-   need to loop back and fix where the db lives per os/config
-*/
-
 package plugins
 
 import (
 	"database/sql"
 	"fmt"
+	"github.com/eholzbach/phosewp/config"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/thoj/go-ircevent"
 	"math/rand"
@@ -15,25 +12,25 @@ import (
 	"time"
 )
 
-func Quote(conn *irc.Connection, event *irc.Event) {
-
-	var replyto string
+// Quote saves and recalls shame
+func Quote(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
 	var reply string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
 
 	query := strings.Split(event.Message(), " ")
 
-	db, err := sql.Open("sqlite3", "./quotes.db")
-	checkError(err)
+	db, err := sql.Open("sqlite3", conf.Dbfile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS quotes (quote TEXT)")
-	checkError(err)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	statement.Exec()
+
 	if len(query) > 1 {
 		if query[1] == "add" && len(query) > 2 {
 			a := strings.TrimPrefix(event.Message(), "!quote add ")
@@ -47,23 +44,23 @@ func Quote(conn *irc.Connection, event *irc.Event) {
 		reply = getQuote(db, -0)
 	}
 
-	conn.Privmsg(replyto, reply)
+	conn.Privmsg(r, reply)
 
 }
 
-func checkError(err error) {
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-}
-
+// addQuote adds shame to the shame db
 func addQuote(db *sql.DB, quote string) string {
 	var a string
+
 	statement, err := db.Prepare("INSERT INTO quotes VALUES (?)")
-	checkError(err)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	add, err := statement.Exec(quote)
-	checkError(err)
+	if err != nil {
+		fmt.Println(err)
+	}
 	id, err := add.LastInsertId()
 	if err != nil {
 		a = "error"
@@ -72,6 +69,7 @@ func addQuote(db *sql.DB, quote string) string {
 	return a
 }
 
+// getQuote retrieves shame from the shame db
 func getQuote(db *sql.DB, id int) string {
 	var a string
 	var q string
@@ -79,10 +77,15 @@ func getQuote(db *sql.DB, id int) string {
 		a = dbQuery(db, id)
 	} else {
 		row, err := db.Query("SELECT Count(*) FROM quotes")
-		checkError(err)
+		if err != nil {
+			fmt.Println(err)
+		}
+
 		for row.Next() {
 			err := row.Scan(&q)
-			checkError(err)
+			if err != nil {
+				fmt.Println(err)
+			}
 			a = q
 		}
 		rand.Seed(time.Now().UnixNano())
@@ -99,15 +102,20 @@ func getQuote(db *sql.DB, id int) string {
 	return a
 }
 
+// dbQuery queries the shame db
 func dbQuery(db *sql.DB, id int) string {
 	var response string
 	var q string
 	a := fmt.Sprintf("SELECT quote FROM quotes WHERE ROWID = %d", id)
 	row, err := db.Query(a)
-	checkError(err)
+	if err != nil {
+		fmt.Println(err)
+	}
 	for row.Next() {
 		err = row.Scan(&q)
-		checkError(err)
+		if err != nil {
+			fmt.Println(err)
+		}
 		response = q
 	}
 	return response

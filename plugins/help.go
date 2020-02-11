@@ -5,17 +5,11 @@ import (
 	"strings"
 )
 
-func Help(conn *irc.Connection, event *irc.Event) {
+// Help provides basic usage instructions
+func Help(conn *irc.Connection, r string, event *irc.Event) {
 
 	var query string
 	var response string
-	var replyto string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
 
 	a := strings.Split(event.Message(), " ")
 
@@ -24,18 +18,18 @@ func Help(conn *irc.Connection, event *irc.Event) {
 	}
 
 	switch query {
-	case "acronym":
-		response = "string ; V.E.R.A. -- Virtual Entity of Relevant Acronyms"
-	case "drama":
-		response = "string ; In lulz we trust"
+	case "bs":
+		response = "string ; Corporate bullshit generator"
 	case "dict":
-		response = "string ; Queries WordNet, a large lexical database of English"
+		response = "string ; Queries a dictionary"
 	case "fu":
 		response = "nil or string ; FoaaS"
 	case "news":
 		response = "nil or string ; Prints a recent article title from random garbage news source"
 	case "quote":
 		response = "add string to save ; get [id] to fetch quote"
+	case "ron":
+		response = "string ; Ron Swanson"
 	case "stock":
 		response = "string ; Stock price at previous day closing"
 	case "trump":
@@ -47,8 +41,8 @@ func Help(conn *irc.Connection, event *irc.Event) {
 	case "wiki":
 		response = "string ; Wikipedia"
 	default:
-		response = "Commands are: acronym, drama, dict, fu, news, stock, trump, urban, weather, wiki"
+		response = "Commands are: dict, fu, news, stock, trump, urban, weather, wiki"
 	}
 
-	conn.Privmsg(replyto, response)
+	conn.Privmsg(r, response)
 }

@@ -1,7 +1,3 @@
-/*
-  shitpost title parser
-*/
-
 package plugins
 
 import (
@@ -13,16 +9,8 @@ import (
 	"strings"
 )
 
-func Url(conn *irc.Connection, event *irc.Event) {
-
-	var replyto string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
-
+// Url resolves website titles
+func Url(conn *irc.Connection, r string, event *irc.Event) {
 	a := strings.Split(event.Message(), " ")
 	for _, b := range a {
 		if strings.HasPrefix(b, "http://") || strings.HasPrefix(b, "https://") {
@@ -35,13 +23,14 @@ func Url(conn *irc.Connection, event *irc.Event) {
 			if title, ok := GetTitle(response.Body); ok {
 				title = strings.Replace(title, "\n", "", -1)
 				title = strings.TrimSpace(title)
-				conn.Privmsg(replyto, title)
+				conn.Privmsg(r, title)
 			}
 
 		}
 	}
 }
 
+// GetTitle reads the url and returns the title
 func GetTitle(r io.Reader) (string, bool) {
 	doc, err := html.Parse(r)
 	if err != nil {
@@ -51,6 +40,7 @@ func GetTitle(r io.Reader) (string, bool) {
 	return traverse(doc)
 }
 
+// isTitleElement tests for the title tag
 func isTitleElement(n *html.Node) bool {
 	return n.Type == html.ElementNode && n.Data == "title"
 }

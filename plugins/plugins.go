@@ -1,44 +1,59 @@
+// Package plugins is the main handler for all plugins available
 package plugins
 
 import (
+	"github.com/eholzbach/phosewp/config"
 	"github.com/thoj/go-ircevent"
 	"strings"
 )
 
-func Plugins(conn *irc.Connection, channels []string, darksky string, newsapi string) {
+// Plugins function handles routing to all plugins
+func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
-		query := strings.Split(event.Message(), " ")
-		switch query[0] {
+		// reply target
+		var r string
 
-		case "!acronym":
-			Dict(conn, event)
-		case "!drama":
-			Dramatica(conn, event)
+		if strings.HasPrefix(event.Arguments[0], "#") {
+			// channel
+			r = event.Arguments[0]
+		} else {
+			// user
+			r = event.Nick
+		}
+
+		// get event prefix
+		query := strings.Split(event.Message(), " ")
+
+		switch query[0] {
+		case "!bs":
+			Bs(conn, r, event)
 		case "!dict":
-			Dict(conn, event)
+			Dict(conn, r, event, conf)
 		case "!fu":
-			FoaaS(conn, event)
+			FoaaS(conn, r, event)
 		case "!help":
-			Help(conn, event)
+			Help(conn, r, event)
 		case "!news":
-			News(conn, event, newsapi)
+			News(conn, r, event, conf)
 		case "!quote":
-			Quote(conn, event)
+			Quote(conn, r, event, conf)
+		case "!ron":
+			Ron(conn, r, event)
 		case "!stock":
-			Stocks(conn, event)
+			Stocks(conn, r, event)
 		case "!trump":
-			Tronald(conn, event)
+			Tronald(conn, r, event)
 		case "!urban":
-			Urban(conn, event)
+			Urban(conn, r, event)
 		case "!weather":
-			Weather(conn, event, darksky)
+			Weather(conn, r, event, conf)
 		case "!wiki":
-			Wiki(conn, event)
+			Wiki(conn, r, event)
 		default:
 		}
 
 		if strings.Contains(event.Message(), "http://") || strings.Contains(event.Message(), "https://") {
-			Url(conn, event)
+			Url(conn, r, event)
 		}
 	})
 }

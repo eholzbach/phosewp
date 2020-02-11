@@ -3,6 +3,7 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/eholzbach/phosewp/config"
 	"github.com/thoj/go-ircevent"
 	"math/rand"
 	"net/http"
@@ -27,6 +28,7 @@ type fakeNews struct {
 	} `json:"articles"`
 }
 
+// breitButt provides lolwuts?
 func breitButt(event *irc.Event, token string) string {
 
 	sources := []string{
@@ -91,21 +93,13 @@ func breitButt(event *irc.Event, token string) string {
 	return "no articles found"
 }
 
-func News(conn *irc.Connection, event *irc.Event, token string) {
-
-	if len(token) <= 1 {
+// News provides garbage titles from garbage sources
+func News(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+	if len(conf.Newsapi) <= 1 {
 		fmt.Println("newsapi key not found")
 		return
 	}
 
-	var replyto string
-
-	if strings.HasPrefix(event.Arguments[0], "#") {
-		replyto = event.Arguments[0]
-	} else {
-		replyto = event.Nick
-	}
-
-	line := breitButt(event, token)
-	conn.Privmsg(replyto, line)
+	line := breitButt(event, conf.Newsapi)
+	conn.Privmsg(r, line)
 }
