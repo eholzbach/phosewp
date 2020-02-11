@@ -1,51 +1,81 @@
 package plugins
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/eholzbach/phosewp/config"
 	"github.com/thoj/go-ircevent"
-	"golang.org/x/net/dict"
+	"net/http"
 	"strings"
-	"time"
 )
 
-//  Dict queries dict.org using RFC2229. The world before RESTful api's was awful.
-func Dict(conn *irc.Connection, r string, event *irc.Event) {
-	var db string
-	var query string
+type webster []struct {
+	Meta struct {
+		ID        string   `json:"id"`
+		UUID      string   `json:"uuid"`
+		Sort      string   `json:"sort"`
+		Src       string   `json:"src"`
+		Section   string   `json:"section"`
+		Stems     []string `json:"stems"`
+		Offensive bool     `json:"offensive"`
+	} `json:"meta"`
+	Hwi struct {
+		Hw  string `json:"hw"`
+		Prs []struct {
+			Mw    string `json:"mw"`
+			Sound struct {
+				Audio string `json:"audio"`
+				Ref   string `json:"ref"`
+				Stat  string `json:"stat"`
+			} `json:"sound"`
+		} `json:"prs"`
+	} `json:"hwi"`
+	Fl  string `json:"fl"`
+	Ins []struct {
+		Il  string `json:"il"`
+		If  string `json:"if"`
+		Prs []struct {
+			Mw    string `json:"mw"`
+			Sound struct {
+				Audio string `json:"audio"`
+				Ref   string `json:"ref"`
+				Stat  string `json:"stat"`
+			} `json:"sound"`
+		} `json:"prs"`
+	} `json:"ins"`
+	Def []struct {
+		Sseq [][][]interface{} `json:"sseq"`
+	} `json:"def"`
+	Et       [][]string `json:"et"`
+	Date     string     `json:"date"`
+	Shortdef []string   `json:"shortdef"`
+}
 
-	if strings.HasPrefix(event.Message(), "!dict ") {
-		db = "wn" // word net
-		query = strings.TrimPrefix(event.Message(), "!dict ")
-	} else {
-		db = "moby-thesaurus" // moby
-		query = strings.TrimPrefix(event.Message(), "!acronym ")
+//  Dict queries the Merriam-Webster Collegiate Dictionary
+func Dict(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+	if len(conf.Dictionary) <= 1 {
+		fmt.Println("dictionary api key not found")
+		return
 	}
 
-	c, err := dict.Dial("tcp", "dict.org:2628")
+	word := strings.Split(event.Message(), " ")
+	url := fmt.Sprintf("https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s", word[1], conf.Dictionary)
+
+	a, err := http.Get(url)
+
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	d, err := c.Define(db, query)
-	c.Close()
+	defer a.Body.Close()
+	var b webster
+	err = json.NewDecoder(a.Body).Decode(&b)
+	if err != nil {
+		return
+	}
 
-	if len(d) <= 0 {
-		conn.Privmsg(r, "not found")
-	} else {
-		s := strings.Split(string(d[0].Text), "\n")
-		i := 0
-		for _, v := range s {
-			t := strings.TrimSpace(v)
-			conn.Privmsg(r, t)
-			time.Sleep(300 * time.Millisecond)
-			i += 1
-			if i == 4 || i == 8 {
-				time.Sleep(1 * time.Second)
-			}
-			if i == 20 {
-				break
-			}
-		}
+	if len(b) != 0 {
+		conn.Privmsg(r, b[0].Shortdef[0])
 	}
 }

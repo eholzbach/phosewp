@@ -10,7 +10,6 @@ import (
 
 // Global event watcher
 func Global(conn *irc.Connection, conf *config.ConfigVars) {
-
 	conn.AddCallback("001", func(event *irc.Event) {
 		for _, channel := range conf.Channels {
 			conn.Join(channel)

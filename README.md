@@ -15,4 +15,7 @@ handle: g1mpb0t
 channels:
   - #leetbotz
 darksky: api_key
+zipcodes: /path/to/zipcodes.json
+dbfile: /path/to/sql.db
+newsapi: api_key
 ```

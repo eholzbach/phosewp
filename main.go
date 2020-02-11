@@ -11,7 +11,7 @@ import (
 func main() {
 
 	conf := config.Config()
-
+	fmt.Println(conf.Channels)
 	fmt.Printf("connecting bot...\n")
 
 	conn := irc.IRC(conf.Handle, conf.Handle)

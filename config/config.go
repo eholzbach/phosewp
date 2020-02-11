@@ -8,14 +8,15 @@ import (
 )
 
 type ConfigVars struct {
-	Network  string
-	Ssl      bool
-	Handle   string
-	Channels []string
-	Darksky  string
-	Zipcodes string
-	Dbfile   string
-	Newsapi  string
+	Network    string
+	Ssl        bool
+	Handle     string
+	Channels   []string
+	Darksky    string
+	Zipcodes   string
+	Dbfile     string
+	Newsapi    string
+	Dictionary string
 }
 
 // Config reads the configuration file and returns a struct of data
@@ -36,14 +37,15 @@ func Config() *ConfigVars {
 	viper.WatchConfig()
 
 	a := &ConfigVars{
-		Network:  viper.GetString("network"),
-		Ssl:      viper.GetBool("ssl"),
-		Handle:   viper.GetString("handle"),
-		Channels: viper.GetStringSlice("channels"),
-		Darksky:  viper.GetString("darksky"),
-		Zipcodes: viper.GetString("zipcodes"),
-		Dbfile:   viper.GetString("dbfile"),
-		Newsapi:  viper.GetString("newsapi"),
+		Network:    viper.GetString("network"),
+		Ssl:        viper.GetBool("ssl"),
+		Handle:     viper.GetString("handle"),
+		Channels:   viper.GetStringSlice("channels"),
+		Darksky:    viper.GetString("darksky"),
+		Zipcodes:   viper.GetString("zipcodes"),
+		Dbfile:     viper.GetString("dbfile"),
+		Newsapi:    viper.GetString("newsapi"),
+		Dictionary: viper.GetString("dictionary"),
 	}
 
 	return a

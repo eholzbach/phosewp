@@ -50,7 +50,7 @@ func FoaaS(conn *irc.Connection, r string, event *irc.Event) {
 	conn.Privmsg(r, reply)
 }
 
-// getRand porfiles a mildly random number
+// getRand provides a mildly random number
 func getRand(count int) int {
 	rand.Seed(time.Now().UnixNano())
 	a := rand.Intn(count-1) + 1
