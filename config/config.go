@@ -9,8 +9,10 @@ import (
 
 type ConfigVars struct {
 	Network    string
+	Sasl       bool
 	Ssl        bool
 	Handle     string
+	Password   string
 	Channels   []string
 	Darksky    string
 	Zipcodes   string
@@ -38,8 +40,10 @@ func Config() *ConfigVars {
 
 	a := &ConfigVars{
 		Network:    viper.GetString("network"),
+		Sasl:       viper.GetBool("sasl"),
 		Ssl:        viper.GetBool("ssl"),
 		Handle:     viper.GetString("handle"),
+		Password:   viper.GetString("password"),
 		Channels:   viper.GetStringSlice("channels"),
 		Darksky:    viper.GetString("darksky"),
 		Zipcodes:   viper.GetString("zipcodes"),
