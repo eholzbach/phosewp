@@ -39,8 +39,6 @@ func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 			Quote(conn, r, event, conf)
 		case "!ron":
 			Ron(conn, r, event)
-		case "!stock":
-			Stocks(conn, r, event)
 		case "!trump":
 			Tronald(conn, r, event)
 		case "!urban":

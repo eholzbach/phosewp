@@ -30,8 +30,6 @@ func Help(conn *irc.Connection, r string, event *irc.Event) {
 		response = "add string to save ; get [id] to fetch quote"
 	case "ron":
 		response = "string ; Ron Swanson"
-	case "stock":
-		response = "string ; Stock price at previous day closing"
 	case "trump":
 		response = "string ; Tronald Dump"
 	case "urban":
@@ -41,7 +39,7 @@ func Help(conn *irc.Connection, r string, event *irc.Event) {
 	case "wiki":
 		response = "string ; Wikipedia"
 	default:
-		response = "Commands are: dict, fu, news, stock, trump, urban, weather, wiki"
+		response = "Commands are: dict, fu, news, trump, urban, weather, wiki"
 	}
 
 	conn.Privmsg(r, response)
