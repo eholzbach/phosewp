@@ -58,8 +58,18 @@ func Dict(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigV
 		return
 	}
 
-	word := strings.Split(event.Message(), " ")
-	url := fmt.Sprintf("https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s", word[1], conf.Dictionary)
+	i := strings.Split(event.Message(), " ")
+	if len(i) <= 1 {
+		fmt.Println("no parameter found")
+		return
+	}
+
+	word := strings.Replace(i[1], " ", "", -1)
+	if len(word) <= 1 {
+		fmt.Println("no parameter found")
+	}
+
+	url := fmt.Sprintf("https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s", word, conf.Dictionary)
 
 	a, err := http.Get(url)
 
