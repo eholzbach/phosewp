@@ -51,6 +51,10 @@ func traverse(n *html.Node) (string, bool) {
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if c.NextSibling == nil {
+			break
+		}
+
 		result, ok := traverse(c)
 		if ok {
 			return result, ok
