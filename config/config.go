@@ -47,7 +47,7 @@ func Config() *ConfigVars {
 		Channels:   viper.GetStringSlice("channels"),
 		Darksky:    viper.GetString("darksky"),
 		Zipcodes:   viper.GetString("zipcodes"),
-		Dbfile:     viper.GetString("dbfile"),
+		Dbfile:     viper.GetString("db"),
 		Newsapi:    viper.GetString("newsapi"),
 		Dictionary: viper.GetString("dictionary"),
 	}
