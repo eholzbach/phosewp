@@ -28,28 +28,28 @@ type fakeNews struct {
 	} `json:"articles"`
 }
 
-// breitButt provides lolwuts?
 func breitButt(event *irc.Event, token string) string {
-
-	sources := []string{
-		"breitbart-news",
-		"fox-news",
-		"national-review",
-	}
 
 	url := "https://newsapi.org/v2"
 
-	// try top headlines from a random source
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	// garbage sources only for maximum lolwat
+	sources := []string{
+		"breitbart-news",
+		"the-american-conservative",
+	}
+
 	msg := strings.Split(event.Message(), " ")
 	var endpoint string
+
+	// randomly select a source
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	for _, i := range r.Perm(len(sources)) {
 		if len(msg) > 1 {
 			query := strings.Join(msg[1:], "%20")
-			endpoint = fmt.Sprintf("%s/top-headlines?apiKey=%s&sources=%s&pageSize=1&q=%s", url, token, sources[i], query)
+			endpoint = fmt.Sprintf("%s/top-headlines?apiKey=%s&sources=%s&pageSize=20&q=%s", url, token, sources[i], query)
 		} else {
-			endpoint = fmt.Sprintf("%s/top-headlines?apiKey=%s&sources=%s&pageSize=1", url, token, sources[i])
+			endpoint = fmt.Sprintf("%s/top-headlines?apiKey=%s&sources=%s&pageSize=20", url, token, sources[i])
 		}
 
 		a, err := http.Get(endpoint)
@@ -63,17 +63,18 @@ func breitButt(event *irc.Event, token string) string {
 		json.NewDecoder(a.Body).Decode(&con)
 
 		if con.TotalResults != 0 {
-			return con.Articles[0].Title
+			a := r.Intn(con.TotalResults - 1 + 1)
+			return con.Articles[a].Title
 		}
 	}
 
-	// try everything, limited to a month by api
+	// try everything
 	all := strings.Join(sources, ",")
 	if len(msg) > 1 {
 		query := strings.Join(msg[1:], "%20")
-		endpoint = fmt.Sprintf("%s/everything?apiKey=%s&sources=%s&pageSize=1&q=%s", url, token, all, query)
+		endpoint = fmt.Sprintf("%s/everything?apiKey=%s&sources=%s&pageSize=20&q=%s", url, token, all, query)
 	} else {
-		endpoint = fmt.Sprintf("%s/everything?apiKey=%s&sources=%s&pageSize=1", url, token, all)
+		endpoint = fmt.Sprintf("%s/everything?apiKey=%s&sources=%s&pageSize=20", url, token, all)
 	}
 
 	a, err := http.Get(endpoint)
@@ -87,7 +88,8 @@ func breitButt(event *irc.Event, token string) string {
 	json.NewDecoder(a.Body).Decode(&con)
 
 	if con.TotalResults != 0 {
-		return con.Articles[0].Title
+		a := r.Intn(con.TotalResults - 1 + 1)
+		return con.Articles[a].Title
 	}
 
 	return "no articles found"
