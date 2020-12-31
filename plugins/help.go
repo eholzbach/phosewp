@@ -39,7 +39,7 @@ func Help(conn *irc.Connection, r string, event *irc.Event) {
 	case "wiki":
 		response = "string ; Wikipedia"
 	default:
-		response = "Commands are: bs, dict, fu, news, quote, ron, trump, urban, weather, wiki"
+		response = "Commands are: bs, dict, fu, kanye, news, quote, ron, urban, weather, wiki"
 	}
 
 	conn.Privmsg(r, response)

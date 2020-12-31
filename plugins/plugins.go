@@ -33,14 +33,14 @@ func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 			FoaaS(conn, r, event)
 		case "!help":
 			Help(conn, r, event)
+		case "!kanye":
+			Kanye(conn, r, event)
 		case "!news":
 			News(conn, r, event, conf)
 		case "!quote":
 			Quote(conn, r, event, conf)
 		case "!ron":
 			Ron(conn, r, event)
-		case "!trump":
-			Tronald(conn, r, event)
 		case "!urban":
 			Urban(conn, r, event)
 		case "!weather":
