@@ -24,14 +24,16 @@ func Help(conn *irc.Connection, r string, event *irc.Event) {
 		response = "string ; Queries a dictionary"
 	case "fu":
 		response = "nil or string ; FoaaS"
+	case "joke":
+		response = "string ; Dad jokes"
+	case "kanye":
+		response = "string ; Kanye West"
 	case "news":
 		response = "nil or string ; Prints a recent article title from random garbage news source"
 	case "quote":
 		response = "add string to save ; get [id] to fetch quote"
 	case "ron":
 		response = "string ; Ron Swanson"
-	case "trump":
-		response = "string ; Tronald Dump"
 	case "urban":
 		response = "string ; Urban Dictionary"
 	case "weather":

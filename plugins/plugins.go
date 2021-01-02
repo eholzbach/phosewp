@@ -25,16 +25,14 @@ func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 		query := strings.Split(event.Message(), " ")
 
 		switch query[0] {
-		case "!bs":
-			Bs(conn, r, event)
+		case "!bs", "!joke", "!kanye":
+			Simple(conn, r, event)
 		case "!dict":
 			Dict(conn, r, event, conf)
 		case "!fu":
 			FoaaS(conn, r, event)
 		case "!help":
 			Help(conn, r, event)
-		case "!kanye":
-			Kanye(conn, r, event)
 		case "!news":
 			News(conn, r, event, conf)
 		case "!quote":
