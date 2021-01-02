@@ -19,21 +19,25 @@ func Help(conn *irc.Connection, r string, event *irc.Event) {
 
 	switch query {
 	case "bs":
-		response = "string ; Corporate bullshit generator"
+		response = "nil ; Corporate bullshit generator"
 	case "dict":
 		response = "string ; Queries a dictionary"
 	case "fu":
 		response = "nil or string ; FoaaS"
+	case "insult":
+		response = "nil ; Hurts in the feels"
 	case "joke":
-		response = "string ; Dad jokes"
+		response = "nil ; Dad jokes"
 	case "kanye":
-		response = "string ; Kanye West"
+		response = "nil ; Kanye West"
 	case "news":
 		response = "nil or string ; Prints a recent article title from random garbage news source"
 	case "quote":
 		response = "add string to save ; get [id] to fetch quote"
 	case "ron":
-		response = "string ; Ron Swanson"
+		response = "nil ; Ron Swanson"
+	case "startup":
+		response = "nil ; Startup idea generator"
 	case "urban":
 		response = "string ; Urban Dictionary"
 	case "weather":
@@ -41,7 +45,7 @@ func Help(conn *irc.Connection, r string, event *irc.Event) {
 	case "wiki":
 		response = "string ; Wikipedia"
 	default:
-		response = "Commands are: bs, dict, fu, kanye, news, quote, ron, urban, weather, wiki"
+		response = "Commands are: bs, dict, fu, insult, joke, kanye, news, quote, ron, startup, urban, weather, wiki"
 	}
 
 	conn.Privmsg(r, response)
