@@ -1,17 +1,23 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
+
 	"github.com/eholzbach/phosewp/config"
 	"github.com/eholzbach/phosewp/events"
 	"github.com/eholzbach/phosewp/plugins"
-	"github.com/thoj/go-ircevent"
+	irc "github.com/thoj/go-ircevent"
 )
 
 func main() {
 	// read configuration
-	conf := config.Config()
-	fmt.Printf("connecting bot...\n")
+	log.Print("reading configuration...")
+	conf, err := config.Config()
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
 
 	// set up connection parameters
 	conn := irc.IRC(conf.Handle, conf.Handle)
@@ -20,11 +26,13 @@ func main() {
 	conn.SASLLogin = conf.Handle
 	conn.SASLPassword = conf.Password
 
+	log.Println("connecting bot...")
+
 	// connnect to server
-	err := conn.Connect(conf.Network)
+	err = conn.Connect(conf.Network)
 	if err != nil {
-		fmt.Printf("Error creating connection: %s\n", err)
-		return
+		log.Println(err)
+		os.Exit(1)
 	}
 
 	// start up event handlers

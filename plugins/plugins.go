@@ -2,9 +2,10 @@
 package plugins
 
 import (
-	"github.com/eholzbach/phosewp/config"
-	"github.com/thoj/go-ircevent"
 	"strings"
+
+	"github.com/eholzbach/phosewp/config"
+	irc "github.com/thoj/go-ircevent"
 )
 
 // Plugins function handles routing to all plugins
@@ -27,6 +28,8 @@ func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 		switch query[0] {
 		case "!bs", "!joke", "!insult", "!kanye", "!startup":
 			Simple(conn, r, event)
+		case "!coin":
+			Coins(conn, r, event, conf)
 		case "!dict":
 			Dict(conn, r, event, conf)
 		case "!fu":
@@ -43,8 +46,6 @@ func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 			Urban(conn, r, event)
 		case "!weather":
 			Weather(conn, r, event, conf)
-		case "!wiki":
-			Wiki(conn, r, event)
 		default:
 		}
 

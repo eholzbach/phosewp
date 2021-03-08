@@ -1,8 +1,9 @@
 package plugins
 
 import (
-	"github.com/thoj/go-ircevent"
 	"strings"
+
+	irc "github.com/thoj/go-ircevent"
 )
 
 // Help provides basic usage instructions
@@ -19,33 +20,33 @@ func Help(conn *irc.Connection, r string, event *irc.Event) {
 
 	switch query {
 	case "bs":
-		response = "nil ; Corporate bullshit generator"
+		response = "Corporate bullshit generator"
+	case "coin":
+		response = "Cryptocurrency data, accepts coinmarketcap codes"
 	case "dict":
-		response = "string ; Queries a dictionary"
+		response = "Queries a dictionary"
 	case "fu":
-		response = "nil or string ; FoaaS"
+		response = "FoaaS"
 	case "insult":
-		response = "nil ; Hurts in the feels"
+		response = "Hurts in the feels"
 	case "joke":
-		response = "nil ; Dad jokes"
+		response = "Dad jokes"
 	case "kanye":
-		response = "nil ; Kanye West"
+		response = "Kanye West"
 	case "news":
-		response = "nil or string ; Prints a recent article title from random garbage news source"
+		response = "Prints a recent article title from random garbage news source"
 	case "quote":
-		response = "add string to save ; get [id] to fetch quote"
+		response = "Stores and fetches quotes ; <add string> to save ; <get> to fetch"
 	case "ron":
-		response = "nil ; Ron Swanson"
+		response = "Ron Swanson"
 	case "startup":
-		response = "nil ; Startup idea generator"
+		response = "Startup idea generator"
 	case "urban":
-		response = "string ; Urban Dictionary"
+		response = "Urban Dictionary"
 	case "weather":
-		response = "zip code ; Returns the current temperature, weather condition, humidity, wind, 'feels like' temperature, barometric pressure, and visibility"
-	case "wiki":
-		response = "string ; Wikipedia"
+		response = "Returns weather conditials by zip code"
 	default:
-		response = "Commands are: bs, dict, fu, insult, joke, kanye, news, quote, ron, startup, urban, weather, wiki"
+		response = "Commands are: bs, coin, dict, fu, insult, joke, kanye, news, quote, ron, startup, urban, weather"
 	}
 
 	conn.Privmsg(r, response)
