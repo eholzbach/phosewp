@@ -1,4 +1,4 @@
-phosewp [![Build Status](https://travis-ci.org/eholzbach/phosewp.svg?branch=master)](https://travis-ci.org/eholzbach/phosewp)
+phosewp [![Build Status](https://travis-ci.com/eholzbach/phosewp.svg?branch=master)](https://travis-ci.org/eholzbach/phosewp)
 ============
 
 Yet another irc bot based on [go-ircevent](https://github.com/thoj/go-ircevent)

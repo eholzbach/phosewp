@@ -75,7 +75,7 @@ func coins(conn *irc.Connection, r string, event *irc.Event, conf *config.Config
 			log.Println(err)
 			return
 		}
-		a := fmt.Sprintf("%s: %s  -  Price: $%.2f  -  Change: 1h %.2f%%,  1d %.2f%%,  30d, %.2f%%", c.Symbol, c.Name, c.Quote.USD.Price, c.Quote.USD.PercentChange1H, c.Quote.USD.PercentChange7D, c.Quote.USD.PercentChange30D)
+		a := fmt.Sprintf("%s: %s  -  Price: $%.2f  -  Change: 1h %.2f%%,  1d %.2f%%,  30d %.2f%%", c.Symbol, c.Name, c.Quote.USD.Price, c.Quote.USD.PercentChange1H, c.Quote.USD.PercentChange7D, c.Quote.USD.PercentChange30D)
 		conn.Privmsg(r, a)
 	}
 
