@@ -3,21 +3,22 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/thoj/go-ircevent"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	irc "github.com/thoj/go-ircevent"
 )
 
-type APIResponse struct {
-	Results []Result `json:"list"`
+type apiResponse struct {
+	Results []result `json:"list"`
 	Tags    []string `json:"tags"`
 	Type    string   `json:"result_type"`
 }
 
-type Result struct {
-	Id         int32  `json:"defid"`
+type result struct {
+	ID         int32  `json:"defid"`
 	Author     string `json:"author"`
 	Definition string `json:"definition"`
 	Link       string `json:"permalink"`
@@ -27,9 +28,9 @@ type Result struct {
 }
 
 // Urban provides garbage from urban dict
-func Urban(conn *irc.Connection, r string, event *irc.Event) {
+func urban(conn *irc.Connection, r string, event *irc.Event) {
 	query := strings.TrimPrefix(event.Message(), "!urban ")
-	response, err := DefineWord(query)
+	response, err := defineWord(query)
 
 	if err != nil {
 		fmt.Println(err)
@@ -50,7 +51,7 @@ func Urban(conn *irc.Connection, r string, event *irc.Event) {
 			if len(line) > 1 {
 				conn.Privmsg(r, line)
 				time.Sleep(300 * time.Millisecond)
-				lcount += 1
+				lcount++
 				if lcount == 4 {
 					time.Sleep(2 * time.Second)
 					tcount += lcount
@@ -65,7 +66,7 @@ func Urban(conn *irc.Connection, r string, event *irc.Event) {
 }
 
 // DefineWord looks up a word on urban dict
-func DefineWord(word string) (response *APIResponse, err error) {
+func defineWord(word string) (response *apiResponse, err error) {
 
 	s := url.QueryEscape(word)
 	endpoint := fmt.Sprintf("http://api.urbandictionary.com/v0/define?page=%d&term=%s", 1, s)

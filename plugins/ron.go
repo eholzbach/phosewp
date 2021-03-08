@@ -2,14 +2,15 @@ package plugins
 
 import (
 	"fmt"
-	"github.com/thoj/go-ircevent"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	irc "github.com/thoj/go-ircevent"
 )
 
 // Ron would like you to shut up and idle
-func Ron(conn *irc.Connection, r string, event *irc.Event) {
+func ron(conn *irc.Connection, r string, event *irc.Event) {
 	a, err := http.Get("https://ron-swanson-quotes.herokuapp.com/v2/quotes")
 
 	if err != nil {

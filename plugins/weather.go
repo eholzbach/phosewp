@@ -3,15 +3,16 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/eholzbach/phosewp/config"
-	"github.com/thoj/go-ircevent"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/eholzbach/phosewp/config"
+	irc "github.com/thoj/go-ircevent"
 )
 
-type Zipcodes struct {
+type zipcodes struct {
 	Data []struct {
 		Zipcode   string `json:"zipcode"`
 		Latitude  string `json:"latitude"`
@@ -19,7 +20,7 @@ type Zipcodes struct {
 	} `json:"data"`
 }
 
-type Forcast struct {
+type forcast struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 	Timezone  string  `json:"timezone"`
@@ -131,8 +132,8 @@ type Forcast struct {
 	Offset int `json:"offset"`
 }
 
-// Weather returns a forcast summary from Darksky
-func Weather(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+// weather returns a forcast summary from Darksky
+func weather(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
 	if len(conf.Darksky) <= 1 {
 		fmt.Println("dark sky api key not found")
 		return
@@ -160,7 +161,7 @@ func Weather(conn *irc.Connection, r string, event *irc.Event, conf *config.Conf
 		return
 	}
 	defer resp.Body.Close()
-	var con Forcast
+	var con forcast
 	json.NewDecoder(resp.Body).Decode(&con)
 
 	humidity := strconv.FormatFloat(con.Currently.Humidity, 'f', 2, 64)[2:]
@@ -192,7 +193,7 @@ func validInput(a []string) bool {
 
 // getCoordinates resolves estimated gps coorinates from a zipcode
 func getCoordinates(query string, file *os.File) (string, string) {
-	var z *Zipcodes
+	var z *zipcodes
 	err := json.NewDecoder(file).Decode(&z)
 
 	if err != nil {

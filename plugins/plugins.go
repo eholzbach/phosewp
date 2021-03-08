@@ -27,30 +27,30 @@ func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
 
 		switch query[0] {
 		case "!bs", "!joke", "!insult", "!kanye", "!startup":
-			Simple(conn, r, event)
+			simple(conn, r, event)
 		case "!coin":
-			Coins(conn, r, event, conf)
+			coins(conn, r, event, conf)
 		case "!dict":
-			Dict(conn, r, event, conf)
+			dict(conn, r, event, conf)
 		case "!fu":
-			FoaaS(conn, r, event)
+			foaas(conn, r, event)
 		case "!help":
-			Help(conn, r, event)
+			help(conn, r, event)
 		case "!news":
-			News(conn, r, event, conf)
+			news(conn, r, event, conf)
 		case "!quote":
-			Quote(conn, r, event, conf)
+			quote(conn, r, event, conf)
 		case "!ron":
-			Ron(conn, r, event)
+			ron(conn, r, event)
 		case "!urban":
-			Urban(conn, r, event)
+			urban(conn, r, event)
 		case "!weather":
-			Weather(conn, r, event, conf)
+			weather(conn, r, event, conf)
 		default:
 		}
 
 		if strings.Contains(event.Message(), "http://") || strings.Contains(event.Message(), "https://") {
-			Url(conn, r, event)
+			urlz(conn, r, event)
 		}
 	})
 }

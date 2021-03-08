@@ -12,11 +12,11 @@ import (
 	irc "github.com/thoj/go-ircevent"
 )
 
-type Data struct {
+type data struct {
 	Data map[string]*json.RawMessage
 }
 
-type Coin struct {
+type cdata struct {
 	Name   string `json:"name"`
 	Symbol string `json:"symbol"`
 	Quote  struct {
@@ -31,7 +31,7 @@ type Coin struct {
 	} `json:"quote"`
 }
 
-func Coins(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func coins(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
 	if len(conf.Coinmarketcap) <= 1 {
 		log.Println("coinmarketcap api key not found")
 		return
@@ -65,12 +65,12 @@ func Coins(conn *irc.Connection, r string, event *irc.Event, conf *config.Config
 
 	defer resp.Body.Close()
 
-	var d Data
+	var d data
 
 	json.NewDecoder(resp.Body).Decode(&d)
 
 	for _, v := range d.Data {
-		var c Coin
+		var c cdata
 		if err := json.Unmarshal(*v, &c); err != nil {
 			log.Println(err)
 			return

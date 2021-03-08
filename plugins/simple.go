@@ -3,9 +3,10 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/thoj/go-ircevent"
 	"net/http"
 	"strings"
+
+	irc "github.com/thoj/go-ircevent"
 )
 
 type gresp struct {
@@ -17,8 +18,8 @@ type gresp struct {
 	This   string `json:"this"`
 }
 
-// Simple makes calls to simple api's
-func Simple(conn *irc.Connection, r string, event *irc.Event) {
+// simple makes calls to simple api's
+func simple(conn *irc.Connection, r string, event *irc.Event) {
 
 	var url string
 

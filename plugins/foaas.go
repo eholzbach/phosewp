@@ -3,14 +3,15 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/thoj/go-ircevent"
 	"math/rand"
 	"net/http"
 	"strings"
 	"time"
+
+	irc "github.com/thoj/go-ircevent"
 )
 
-type Foff struct {
+type foff struct {
 	Message  string `json:"message"`
 	Subtitle string `json:"subtitle"`
 }
@@ -24,8 +25,8 @@ type operators []struct {
 	} `json:"fields"`
 }
 
-// Foaas provides you with a joyful fuck off as a service
-func FoaaS(conn *irc.Connection, r string, event *irc.Event) {
+// foaas provides you with a joyful fuck off as a service
+func foaas(conn *irc.Connection, r string, event *irc.Event) {
 	var reply string
 
 	name := strings.Trim(strings.TrimPrefix(event.Message(), "!fu"), " ")
@@ -85,7 +86,7 @@ func getFoaas(endpoint string, name string) string {
 	}
 
 	defer resp.Body.Close()
-	var fo Foff
+	var fo foff
 	json.NewDecoder(resp.Body).Decode(&fo)
 
 	if len(fo.Message) <= 0 {
@@ -121,7 +122,7 @@ func randFoaas(con operators, name string) string {
 			break
 		}
 		time.Sleep(500 * time.Millisecond)
-		count += 1
+		count++
 		continue
 	}
 

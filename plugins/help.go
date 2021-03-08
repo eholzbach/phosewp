@@ -7,7 +7,7 @@ import (
 )
 
 // Help provides basic usage instructions
-func Help(conn *irc.Connection, r string, event *irc.Event) {
+func help(conn *irc.Connection, r string, event *irc.Event) {
 
 	var query string
 	var response string

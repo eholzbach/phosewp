@@ -3,12 +3,13 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/eholzbach/phosewp/config"
-	"github.com/thoj/go-ircevent"
 	"math/rand"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/eholzbach/phosewp/config"
+	irc "github.com/thoj/go-ircevent"
 )
 
 type fakeNews struct {
@@ -96,7 +97,7 @@ func breitButt(event *irc.Event, token string) string {
 }
 
 // News provides garbage titles from garbage sources
-func News(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func news(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
 	if len(conf.Newsapi) <= 1 {
 		fmt.Println("newsapi key not found")
 		return

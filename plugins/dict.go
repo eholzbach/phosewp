@@ -3,10 +3,11 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/eholzbach/phosewp/config"
-	"github.com/thoj/go-ircevent"
 	"net/http"
 	"strings"
+
+	"github.com/eholzbach/phosewp/config"
+	irc "github.com/thoj/go-ircevent"
 )
 
 type webster []struct {
@@ -52,7 +53,7 @@ type webster []struct {
 }
 
 //  Dict queries the Merriam-Webster Collegiate Dictionary
-func Dict(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func dict(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
 	if len(conf.Dictionary) <= 1 {
 		fmt.Println("dictionary api key not found")
 		return

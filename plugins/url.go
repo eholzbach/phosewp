@@ -2,15 +2,16 @@ package plugins
 
 import (
 	"fmt"
-	"github.com/thoj/go-ircevent"
-	"golang.org/x/net/html"
 	"io"
 	"net/http"
 	"strings"
+
+	irc "github.com/thoj/go-ircevent"
+	"golang.org/x/net/html"
 )
 
-// Url resolves website titles
-func Url(conn *irc.Connection, r string, event *irc.Event) {
+// url resolves website titles
+func urlz(conn *irc.Connection, r string, event *irc.Event) {
 	a := strings.Split(event.Message(), " ")
 	for _, b := range a {
 		if strings.HasPrefix(b, "http://") || strings.HasPrefix(b, "https://") {

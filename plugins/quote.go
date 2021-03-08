@@ -3,17 +3,21 @@ package plugins
 import (
 	"database/sql"
 	"fmt"
+
 	"github.com/eholzbach/phosewp/config"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/thoj/go-ircevent"
+	irc "github.com/thoj/go-ircevent"
+
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
+
+	// sqlite support
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // Quote saves and recalls shame
-func Quote(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func quote(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
 	var reply string
 
 	query := strings.Split(event.Message(), " ")
