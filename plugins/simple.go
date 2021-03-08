@@ -3,6 +3,7 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -45,7 +46,7 @@ func simple(conn *irc.Connection, r string, event *irc.Event) {
 	res, err := client.Do(req)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 

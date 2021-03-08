@@ -1,8 +1,8 @@
 package plugins
 
 import (
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 
@@ -17,7 +17,7 @@ func urlz(conn *irc.Connection, r string, event *irc.Event) {
 		if strings.HasPrefix(b, "http://") || strings.HasPrefix(b, "https://") {
 			response, err := http.Get(b)
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 				return
 			}
 			defer response.Body.Close()
@@ -35,7 +35,7 @@ func urlz(conn *irc.Connection, r string, event *irc.Event) {
 func GetTitle(r io.Reader) (string, bool) {
 	doc, err := html.Parse(r)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return "", false
 	}
 

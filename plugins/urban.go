@@ -3,6 +3,7 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -33,7 +34,7 @@ func urban(conn *irc.Connection, r string, event *irc.Event) {
 	response, err := defineWord(query)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
@@ -72,7 +73,7 @@ func defineWord(word string) (response *apiResponse, err error) {
 	endpoint := fmt.Sprintf("http://api.urbandictionary.com/v0/define?page=%d&term=%s", 1, s)
 	resp, err := http.Get(endpoint)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
@@ -81,7 +82,7 @@ func defineWord(word string) (response *apiResponse, err error) {
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&response)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 

@@ -1,8 +1,8 @@
 package plugins
 
 import (
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 
@@ -14,13 +14,13 @@ func ron(conn *irc.Connection, r string, event *irc.Event) {
 	a, err := http.Get("https://ron-swanson-quotes.herokuapp.com/v2/quotes")
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
 	b, err := ioutil.ReadAll(a.Body)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 

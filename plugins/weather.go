@@ -3,6 +3,7 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -135,7 +136,7 @@ type forcast struct {
 // weather returns a forcast summary from Darksky
 func weather(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
 	if len(conf.Darksky) <= 1 {
-		fmt.Println("dark sky api key not found")
+		log.Println("dark sky api key not found")
 		return
 	}
 
@@ -157,7 +158,7 @@ func weather(conn *irc.Connection, r string, event *irc.Event, conf *config.Conf
 	endpoint := fmt.Sprintf("https://api.darksky.net/forecast/%s/%s,%s", conf.Darksky, latitude, longitude)
 	resp, err := http.Get(endpoint)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 	defer resp.Body.Close()

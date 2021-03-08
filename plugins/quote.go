@@ -3,6 +3,7 @@ package plugins
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/eholzbach/phosewp/config"
 	irc "github.com/thoj/go-ircevent"
@@ -24,13 +25,13 @@ func quote(conn *irc.Connection, r string, event *irc.Event, conf *config.Config
 
 	db, err := sql.Open("sqlite3", conf.Dbfile)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
 	statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS quotes (quote TEXT)")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 	statement.Exec()
@@ -58,12 +59,12 @@ func addQuote(db *sql.DB, quote string) string {
 
 	statement, err := db.Prepare("INSERT INTO quotes VALUES (?)")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	add, err := statement.Exec(quote)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	id, err := add.LastInsertId()
 	if err != nil {
@@ -82,13 +83,13 @@ func getQuote(db *sql.DB, id int) string {
 	} else {
 		row, err := db.Query("SELECT Count(*) FROM quotes")
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		for row.Next() {
 			err := row.Scan(&q)
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
 			a = q
 		}
@@ -113,12 +114,12 @@ func dbQuery(db *sql.DB, id int) string {
 	a := fmt.Sprintf("SELECT quote FROM quotes WHERE ROWID = %d", id)
 	row, err := db.Query(a)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	for row.Next() {
 		err = row.Scan(&q)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		response = q
 	}

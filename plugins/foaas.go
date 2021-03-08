@@ -3,6 +3,7 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"strings"
@@ -73,7 +74,7 @@ func getFoaas(endpoint string, name string) string {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return "foaas fucked off"
 	}
 
@@ -81,7 +82,7 @@ func getFoaas(endpoint string, name string) string {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return "foaas fucked off"
 	}
 
@@ -90,7 +91,7 @@ func getFoaas(endpoint string, name string) string {
 	json.NewDecoder(resp.Body).Decode(&fo)
 
 	if len(fo.Message) <= 0 {
-		fmt.Println(fo.Message)
+		log.Println(fo.Message)
 		b = "short"
 	} else {
 		b = fo.Message
@@ -106,7 +107,7 @@ func randFoaas(con operators, name string) string {
 
 	for {
 		if count > 30 {
-			fmt.Println("failed to FoaaS")
+			log.Println("failed to FoaaS")
 			break
 		}
 		a = getRand(len(con))

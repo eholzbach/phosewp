@@ -3,6 +3,7 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"strings"
@@ -99,7 +100,7 @@ func breitButt(event *irc.Event, token string) string {
 // News provides garbage titles from garbage sources
 func news(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
 	if len(conf.Newsapi) <= 1 {
-		fmt.Println("newsapi key not found")
+		log.Println("newsapi key not found")
 		return
 	}
 

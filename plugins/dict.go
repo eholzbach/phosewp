@@ -3,6 +3,7 @@ package plugins
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -55,19 +56,19 @@ type webster []struct {
 //  Dict queries the Merriam-Webster Collegiate Dictionary
 func dict(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
 	if len(conf.Dictionary) <= 1 {
-		fmt.Println("dictionary api key not found")
+		log.Println("dictionary api key not found")
 		return
 	}
 
 	i := strings.Split(event.Message(), " ")
 	if len(i) <= 1 {
-		fmt.Println("no parameter found")
+		log.Println("no parameter found")
 		return
 	}
 
 	word := strings.Replace(i[1], " ", "", -1)
 	if len(word) <= 1 {
-		fmt.Println("no parameter found")
+		log.Println("no parameter found")
 	}
 
 	url := fmt.Sprintf("https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s", word, conf.Dictionary)
@@ -75,7 +76,7 @@ func dict(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigV
 	a, err := http.Get(url)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
@@ -83,6 +84,7 @@ func dict(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigV
 	var b webster
 	err = json.NewDecoder(a.Body).Decode(&b)
 	if err != nil {
+		log.Println(err)
 		return
 	}
 
