@@ -19,6 +19,7 @@ func ron(conn *irc.Connection, r string, event *irc.Event) {
 	}
 
 	b, err := ioutil.ReadAll(a.Body)
+
 	if err != nil {
 		log.Println(err)
 		return

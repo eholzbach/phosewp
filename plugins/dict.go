@@ -81,9 +81,10 @@ func dict(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	}
 
 	defer a.Body.Close()
+
 	var b webster
-	err = json.NewDecoder(a.Body).Decode(&b)
-	if err != nil {
+
+	if err := json.NewDecoder(a.Body).Decode(&b); err != nil {
 		log.Println(err)
 		return
 	}

@@ -44,10 +44,10 @@ func urban(conn *irc.Connection, r string, event *irc.Event) {
 	}
 
 	for _, def := range response.Results {
-		defResponse := fmt.Sprintf("%s", def.Definition)
-		s := strings.Split(string(defResponse), "\n")
-		lcount := 0
-		tcount := 0
+		s := strings.Split(string(def.Definition), "\n")
+
+		var lcount, tcount int
+
 		for _, line := range s {
 			if len(line) > 1 {
 				conn.Privmsg(r, line)
@@ -68,10 +68,11 @@ func urban(conn *irc.Connection, r string, event *irc.Event) {
 
 // DefineWord looks up a word on urban dict
 func defineWord(word string) (response *apiResponse, err error) {
-
 	s := url.QueryEscape(word)
 	endpoint := fmt.Sprintf("http://api.urbandictionary.com/v0/define?page=%d&term=%s", 1, s)
+
 	resp, err := http.Get(endpoint)
+
 	if err != nil {
 		log.Println(err)
 		return
@@ -80,10 +81,9 @@ func defineWord(word string) (response *apiResponse, err error) {
 	defer resp.Body.Close()
 
 	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&response)
-	if err != nil {
+
+	if err := dec.Decode(&response); err != nil {
 		log.Println(err)
-		return
 	}
 
 	return

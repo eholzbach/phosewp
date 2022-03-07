@@ -148,6 +148,7 @@ func weather(conn *irc.Connection, r string, event *irc.Event, conf config.Vars)
 	}
 
 	file, err := os.Open(conf.Zipcodes)
+
 	if err != nil {
 		conn.Privmsg(r, fmt.Sprintf("zipcode data not found"))
 		return
@@ -156,18 +157,24 @@ func weather(conn *irc.Connection, r string, event *irc.Event, conf config.Vars)
 	latitude, longitude := getCoordinates(a[1], file)
 
 	endpoint := fmt.Sprintf("https://api.darksky.net/forecast/%s/%s,%s", conf.Darksky, latitude, longitude)
+
 	resp, err := http.Get(endpoint)
+
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
 	defer resp.Body.Close()
+
 	var con forcast
+
 	json.NewDecoder(resp.Body).Decode(&con)
 
 	humidity := strconv.FormatFloat(con.Currently.Humidity, 'f', 2, 64)[2:]
 	b := fmt.Sprintf("%s, Wind %.0f mph, Humidity %s%%, Temperature %.0f°", con.Currently.Summary, con.Currently.WindSpeed, humidity, con.Currently.Temperature)
 	conn.Privmsg(r, b)
+
 	return
 }
 

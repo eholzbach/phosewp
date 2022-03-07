@@ -43,7 +43,9 @@ func foaas(conn *irc.Connection, r string, event *irc.Event) {
 	}
 
 	defer getOps.Body.Close()
+
 	con := operators{}
+
 	json.NewDecoder(getOps.Body).Decode(&con)
 
 	endpoint := randFoaas(con, name)
