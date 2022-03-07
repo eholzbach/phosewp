@@ -98,7 +98,7 @@ func breitButt(event *irc.Event, token string) string {
 }
 
 // News provides garbage titles from garbage sources
-func news(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func news(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	if len(conf.Newsapi) <= 1 {
 		log.Println("newsapi key not found")
 		return

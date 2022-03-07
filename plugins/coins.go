@@ -31,7 +31,7 @@ type cdata struct {
 	} `json:"quote"`
 }
 
-func coins(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func coins(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	if len(conf.Coinmarketcap) <= 1 {
 		log.Println("coinmarketcap api key not found")
 		return

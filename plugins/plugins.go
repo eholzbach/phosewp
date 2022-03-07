@@ -9,7 +9,7 @@ import (
 )
 
 // Plugins function handles routing to all plugins
-func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
+func Plugins(conn *irc.Connection, conf config.Vars) {
 	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
 		// reply target
 		var r string

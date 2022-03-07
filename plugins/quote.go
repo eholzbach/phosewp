@@ -18,7 +18,7 @@ import (
 )
 
 // Quote saves and recalls shame
-func quote(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func quote(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	var reply string
 
 	query := strings.Split(event.Message(), " ")

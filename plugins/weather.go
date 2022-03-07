@@ -134,7 +134,7 @@ type forcast struct {
 }
 
 // weather returns a forcast summary from Darksky
-func weather(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func weather(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	if len(conf.Darksky) <= 1 {
 		log.Println("dark sky api key not found")
 		return

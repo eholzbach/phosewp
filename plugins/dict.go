@@ -54,7 +54,7 @@ type webster []struct {
 }
 
 //  Dict queries the Merriam-Webster Collegiate Dictionary
-func dict(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func dict(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	if len(conf.Dictionary) <= 1 {
 		log.Println("dictionary api key not found")
 		return
