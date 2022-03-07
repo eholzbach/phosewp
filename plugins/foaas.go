@@ -35,7 +35,7 @@ func foaas(conn *irc.Connection, r string, event *irc.Event) {
 		name = "0"
 	}
 
-	getOps, err := http.Get("https://www.foaas.com/operations")
+	getOps, err := getURL("https://www.foaas.com/operations")
 
 	if err != nil {
 		fmt.Println(err)
@@ -67,14 +67,19 @@ func getFoaas(endpoint string, name string) string {
 	var url string
 
 	a := strings.Split(endpoint, "/")
+
 	if len(a) == 4 {
 		url = fmt.Sprintf("https://www.foaas.com/%s/%s/%s", a[1], name, name)
 	} else {
 		url = fmt.Sprintf("https://www.foaas.com/%s/%s", a[1], name)
 	}
 
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
 	req, err := http.NewRequest("GET", url, nil)
+
 	if err != nil {
 		log.Println(err)
 		return "foaas fucked off"
@@ -83,13 +88,16 @@ func getFoaas(endpoint string, name string) string {
 	req.Header.Add("Accept", "application/json")
 
 	resp, err := client.Do(req)
+
 	if err != nil {
 		log.Println(err)
 		return "foaas fucked off"
 	}
 
 	defer resp.Body.Close()
+
 	var fo foff
+
 	json.NewDecoder(resp.Body).Decode(&fo)
 
 	if len(fo.Message) <= 0 {
@@ -98,32 +106,37 @@ func getFoaas(endpoint string, name string) string {
 	} else {
 		b = fo.Message
 	}
+
 	return b
 }
 
 // randFoaas gets a random fuck to give
 func randFoaas(con operators, name string) string {
-	var a int
+	var a, count int
 	var b []string
-	count := 0
 
 	for {
 		if count > 30 {
 			log.Println("failed to FoaaS")
 			break
 		}
+
 		a = getRand(len(con))
 		b = strings.Split(con[a].URL, "/")
+
 		if len(b) == 2 || len(b) == 5 {
 			time.Sleep(500 * time.Millisecond)
 			continue
 		}
+
 		if strings.HasPrefix(b[2], ":from") && name == "0" {
 			break
 		}
+
 		if strings.HasPrefix(b[2], ":name") && name != "0" {
 			break
 		}
+
 		time.Sleep(500 * time.Millisecond)
 		count++
 		continue

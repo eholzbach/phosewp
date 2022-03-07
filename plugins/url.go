@@ -3,7 +3,6 @@ package plugins
 import (
 	"io"
 	"log"
-	"net/http"
 	"strings"
 
 	irc "github.com/thoj/go-ircevent"
@@ -16,7 +15,7 @@ func urlz(conn *irc.Connection, r string, event *irc.Event) {
 
 	for _, b := range a {
 		if strings.HasPrefix(b, "http://") || strings.HasPrefix(b, "https://") {
-			response, err := http.Get(b)
+			response, err := getURL(b)
 
 			if err != nil {
 				log.Println(err)

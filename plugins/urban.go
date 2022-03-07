@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	irc "github.com/thoj/go-ircevent"
 )
@@ -43,48 +41,30 @@ func urban(conn *irc.Connection, r string, event *irc.Event) {
 		return
 	}
 
-	for _, def := range response.Results {
-		s := strings.Split(string(def.Definition), "\n")
+	s := strings.Replace(response.Results[0].Definition, "[", "", -1)
+	s = strings.Replace(s, "]", "", -1)
 
-		var lcount, tcount int
-
-		for _, line := range s {
-			if len(line) > 1 {
-				conn.Privmsg(r, line)
-				time.Sleep(300 * time.Millisecond)
-				lcount++
-				if lcount == 4 {
-					time.Sleep(2 * time.Second)
-					tcount += lcount
-					lcount = 0
-				}
-				if tcount >= 40 {
-					break
-				}
-			}
-		}
-	}
+	conn.Privmsg(r, s)
 }
 
 // DefineWord looks up a word on urban dict
-func defineWord(word string) (response *apiResponse, err error) {
-	s := url.QueryEscape(word)
-	endpoint := fmt.Sprintf("http://api.urbandictionary.com/v0/define?page=%d&term=%s", 1, s)
+func defineWord(word string) (*apiResponse, error) {
+	var r *apiResponse
 
-	resp, err := http.Get(endpoint)
+	url := fmt.Sprintf("http://api.urbandictionary.com/v0/define?page=1&term=%s", url.QueryEscape(word))
+	resp, err := getURL(url)
 
 	if err != nil {
-		log.Println(err)
-		return
+		return r, err
 	}
 
 	defer resp.Body.Close()
 
 	dec := json.NewDecoder(resp.Body)
 
-	if err := dec.Decode(&response); err != nil {
-		log.Println(err)
+	if err := dec.Decode(&r); err != nil {
+		return r, err
 	}
 
-	return
+	return r, nil
 }

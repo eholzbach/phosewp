@@ -3,7 +3,6 @@ package plugins
 import (
 	"io/ioutil"
 	"log"
-	"net/http"
 	"strings"
 
 	irc "github.com/thoj/go-ircevent"
@@ -11,7 +10,7 @@ import (
 
 // Ron would like you to shut up and idle
 func ron(conn *irc.Connection, r string, event *irc.Event) {
-	a, err := http.Get("https://ron-swanson-quotes.herokuapp.com/v2/quotes")
+	a, err := getURL("https://ron-swanson-quotes.herokuapp.com/v2/quotes")
 
 	if err != nil {
 		log.Println(err)

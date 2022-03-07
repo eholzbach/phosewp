@@ -38,6 +38,7 @@ func coins(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	}
 
 	coin := strings.Trim(strings.TrimPrefix(event.Message(), "!coin"), " ")
+
 	if len(coin) == 0 {
 		return
 	}
