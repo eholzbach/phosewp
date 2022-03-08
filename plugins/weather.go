@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -12,14 +11,6 @@ import (
 	"github.com/eholzbach/phosewp/config"
 	irc "github.com/thoj/go-ircevent"
 )
-
-type zipcodes struct {
-	Data []struct {
-		Zipcode   string `json:"zipcode"`
-		Latitude  string `json:"latitude"`
-		Longitude string `json:"longitude"`
-	} `json:"data"`
-}
 
 type forcast struct {
 	Latitude  float64 `json:"latitude"`
@@ -133,8 +124,21 @@ type forcast struct {
 	Offset int `json:"offset"`
 }
 
+type location struct {
+	Latitude  string
+	Longitude string
+}
+
+type zipcodes struct {
+	Data []struct {
+		Zipcode   string `json:"zipcode"`
+		Latitude  string `json:"latitude"`
+		Longitude string `json:"longitude"`
+	} `json:"data"`
+}
+
 // weather returns a forcast summary from Darksky
-func weather(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func weather(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	if len(conf.Darksky) <= 1 {
 		log.Println("dark sky api key not found")
 		return
@@ -143,32 +147,36 @@ func weather(conn *irc.Connection, r string, event *irc.Event, conf *config.Conf
 	a := strings.Split(event.Message(), " ")
 
 	if !validInput(a) {
-		conn.Privmsg(r, fmt.Sprintf("weather only accepts 5 digit zip codes"))
+		conn.Privmsg(r, "weather only accepts 5 digit zip codes")
 		return
 	}
 
 	file, err := os.Open(conf.Zipcodes)
+
 	if err != nil {
-		conn.Privmsg(r, fmt.Sprintf("zipcode data not found"))
+		conn.Privmsg(r, "zipcode data not found")
 		return
 	}
 
-	latitude, longitude := getCoordinates(a[1], file)
+	l := getCoordinates(a[1], file)
 
-	endpoint := fmt.Sprintf("https://api.darksky.net/forecast/%s/%s,%s", conf.Darksky, latitude, longitude)
-	resp, err := http.Get(endpoint)
+	url := fmt.Sprintf("https://api.darksky.net/forecast/%s/%s,%s", conf.Darksky, l.Latitude, l.Longitude)
+	resp, err := getURL(url)
+
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
 	defer resp.Body.Close()
+
 	var con forcast
+
 	json.NewDecoder(resp.Body).Decode(&con)
 
 	humidity := strconv.FormatFloat(con.Currently.Humidity, 'f', 2, 64)[2:]
 	b := fmt.Sprintf("%s, Wind %.0f mph, Humidity %s%%, Temperature %.0f°", con.Currently.Summary, con.Currently.WindSpeed, humidity, con.Currently.Temperature)
 	conn.Privmsg(r, b)
-	return
 }
 
 // validInput validates the entry is a zip code
@@ -185,27 +193,27 @@ func validInput(a []string) bool {
 		}
 	}
 
-	if i != 5 {
-		return false
-	}
-
-	return true
+	return i == 5
 }
 
 // getCoordinates resolves estimated gps coorinates from a zipcode
-func getCoordinates(query string, file *os.File) (string, string) {
+func getCoordinates(query string, file *os.File) location {
 	var z *zipcodes
-	err := json.NewDecoder(file).Decode(&z)
+	l := location{"21.343331", "-157.941721"}
 
-	if err != nil {
-		return "21.343331", "-157.941721"
+	if err := json.NewDecoder(file).Decode(&z); err != nil {
+		return l
 	}
 
 	for _, v := range z.Data {
 		if v.Zipcode == query {
-			return v.Latitude, v.Longitude
+			l = location{
+				Latitude:  v.Latitude,
+				Longitude: v.Longitude,
+			}
+			return l
 		}
 	}
 
-	return "21.343331", "-157.941721"
+	return l
 }

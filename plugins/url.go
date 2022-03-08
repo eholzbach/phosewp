@@ -3,7 +3,6 @@ package plugins
 import (
 	"io"
 	"log"
-	"net/http"
 	"strings"
 
 	irc "github.com/thoj/go-ircevent"
@@ -13,20 +12,23 @@ import (
 // url resolves website titles
 func urlz(conn *irc.Connection, r string, event *irc.Event) {
 	a := strings.Split(event.Message(), " ")
+
 	for _, b := range a {
 		if strings.HasPrefix(b, "http://") || strings.HasPrefix(b, "https://") {
-			response, err := http.Get(b)
+			response, err := getURL(b)
+
 			if err != nil {
 				log.Println(err)
 				return
 			}
+
 			defer response.Body.Close()
+
 			if title, ok := GetTitle(response.Body); ok {
 				title = strings.Replace(title, "\n", "", -1)
 				title = strings.TrimSpace(title)
 				conn.Privmsg(r, title)
 			}
-
 		}
 	}
 }
@@ -34,6 +36,7 @@ func urlz(conn *irc.Connection, r string, event *irc.Event) {
 // GetTitle reads the url and returns the title
 func GetTitle(r io.Reader) (string, bool) {
 	doc, err := html.Parse(r)
+
 	if err != nil {
 		log.Println(err)
 		return "", false

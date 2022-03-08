@@ -2,10 +2,13 @@
 package config
 
 import (
-	"github.com/spf13/viper"
+	"flag"
+
+	"github.com/BurntSushi/toml"
 )
 
-type ConfigVars struct {
+// Vars is a struct of all configuration options
+type Vars struct {
 	Channels      []string
 	Coinmarketcap string
 	Darksky       string
@@ -15,41 +18,18 @@ type ConfigVars struct {
 	Newsapi       string
 	Network       string
 	Password      string
-	Sasl          bool
-	Ssl           bool
+	SASL          bool
+	TLS           bool
 	Zipcodes      string
 }
 
-// Config reads the configuration file and returns a struct of data
-func Config() (*ConfigVars, error) {
-	viper.SetConfigName("phosewp")
-	viper.SetConfigName(".phosewp")
-	viper.AddConfigPath("/etc/")
-	viper.AddConfigPath("/usr/local/etc/")
-	viper.AddConfigPath("$HOME/")
-	viper.AddConfigPath(".")
+// Config reads the configuration file and returns a struct
+func Config() (Vars, error) {
+	var c Vars
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		return nil, err
-	}
+	cpath := flag.String("config", "phosewp.toml", "configuration file")
+	flag.Parse()
 
-	viper.WatchConfig()
-
-	a := &ConfigVars{
-		Channels:      viper.GetStringSlice("channels"),
-		Coinmarketcap: viper.GetString("coinmarketcap"),
-		Darksky:       viper.GetString("darksky"),
-		Dbfile:        viper.GetString("db"),
-		Dictionary:    viper.GetString("dictionary"),
-		Handle:        viper.GetString("handle"),
-		Newsapi:       viper.GetString("newsapi"),
-		Network:       viper.GetString("network"),
-		Password:      viper.GetString("password"),
-		Sasl:          viper.GetBool("sasl"),
-		Ssl:           viper.GetBool("ssl"),
-		Zipcodes:      viper.GetString("zipcodes"),
-	}
-
-	return a, err
+	_, err := toml.DecodeFile(*cpath, &c)
+	return c, err
 }

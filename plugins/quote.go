@@ -18,22 +18,25 @@ import (
 )
 
 // Quote saves and recalls shame
-func quote(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func quote(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	var reply string
 
 	query := strings.Split(event.Message(), " ")
 
 	db, err := sql.Open("sqlite3", conf.Dbfile)
+
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
 	statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS quotes (quote TEXT)")
+
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
 	statement.Exec()
 
 	if len(query) > 1 {
@@ -48,9 +51,7 @@ func quote(conn *irc.Connection, r string, event *irc.Event, conf *config.Config
 	} else {
 		reply = getQuote(db, -0)
 	}
-
 	conn.Privmsg(r, reply)
-
 }
 
 // addQuote adds shame to the shame db
@@ -58,19 +59,25 @@ func addQuote(db *sql.DB, quote string) string {
 	var a string
 
 	statement, err := db.Prepare("INSERT INTO quotes VALUES (?)")
+
 	if err != nil {
 		log.Println(err)
 	}
 
 	add, err := statement.Exec(quote)
+
 	if err != nil {
 		log.Println(err)
 	}
+
 	id, err := add.LastInsertId()
+
 	if err != nil {
 		a = "error"
 	}
+
 	a = strconv.FormatInt(id, 10)
+
 	return a
 }
 
@@ -78,23 +85,27 @@ func addQuote(db *sql.DB, quote string) string {
 func getQuote(db *sql.DB, id int) string {
 	var a string
 	var q string
+
 	if id > 0 {
 		a = dbQuery(db, id)
 	} else {
 		row, err := db.Query("SELECT Count(*) FROM quotes")
+
 		if err != nil {
 			log.Println(err)
 		}
 
 		for row.Next() {
-			err := row.Scan(&q)
-			if err != nil {
+			if err := row.Scan(&q); err != nil {
 				log.Println(err)
 			}
+
 			a = q
 		}
+
 		rand.Seed(time.Now().UnixNano())
 		c, _ := strconv.Atoi(a)
+
 		if c >= 2 {
 			b := rand.Intn(c-1) + 1
 			a = dbQuery(db, b)
@@ -104,6 +115,7 @@ func getQuote(db *sql.DB, id int) string {
 			a = "no quotes"
 		}
 	}
+
 	return a
 }
 
@@ -111,11 +123,15 @@ func getQuote(db *sql.DB, id int) string {
 func dbQuery(db *sql.DB, id int) string {
 	var response string
 	var q string
+
 	a := fmt.Sprintf("SELECT quote FROM quotes WHERE ROWID = %d", id)
+
 	row, err := db.Query(a)
+
 	if err != nil {
 		log.Println(err)
 	}
+
 	for row.Next() {
 		err = row.Scan(&q)
 		if err != nil {
@@ -123,5 +139,6 @@ func dbQuery(db *sql.DB, id int) string {
 		}
 		response = q
 	}
+
 	return response
 }

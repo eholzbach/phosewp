@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"net/http"
 	"strings"
 	"time"
 
@@ -32,7 +31,7 @@ type fakeNews struct {
 
 func breitButt(event *irc.Event, token string) string {
 
-	url := "https://newsapi.org/v2"
+	api := "https://newsapi.org/v2"
 
 	// garbage sources only for maximum lolwat
 	sources := []string{
@@ -41,7 +40,7 @@ func breitButt(event *irc.Event, token string) string {
 	}
 
 	msg := strings.Split(event.Message(), " ")
-	var endpoint string
+	var url string
 
 	// randomly select a source
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -49,19 +48,21 @@ func breitButt(event *irc.Event, token string) string {
 	for _, i := range r.Perm(len(sources)) {
 		if len(msg) > 1 {
 			query := strings.Join(msg[1:], "%20")
-			endpoint = fmt.Sprintf("%s/top-headlines?apiKey=%s&sources=%s&pageSize=20&q=%s", url, token, sources[i], query)
+			url = fmt.Sprintf("%s/top-headlines?apiKey=%s&sources=%s&pageSize=20&q=%s", api, token, sources[i], query)
 		} else {
-			endpoint = fmt.Sprintf("%s/top-headlines?apiKey=%s&sources=%s&pageSize=20", url, token, sources[i])
+			url = fmt.Sprintf("%s/top-headlines?apiKey=%s&sources=%s&pageSize=20", api, token, sources[i])
 		}
 
-		a, err := http.Get(endpoint)
+		a, err := getURL(url)
 
 		if err != nil {
 			return "failed"
 		}
 
 		defer a.Body.Close()
+
 		var con fakeNews
+
 		json.NewDecoder(a.Body).Decode(&con)
 
 		if con.TotalResults != 0 {
@@ -74,19 +75,21 @@ func breitButt(event *irc.Event, token string) string {
 	all := strings.Join(sources, ",")
 	if len(msg) > 1 {
 		query := strings.Join(msg[1:], "%20")
-		endpoint = fmt.Sprintf("%s/everything?apiKey=%s&sources=%s&pageSize=20&q=%s", url, token, all, query)
+		url = fmt.Sprintf("%s/everything?apiKey=%s&sources=%s&pageSize=20&q=%s", url, token, all, query)
 	} else {
-		endpoint = fmt.Sprintf("%s/everything?apiKey=%s&sources=%s&pageSize=20", url, token, all)
+		url = fmt.Sprintf("%s/everything?apiKey=%s&sources=%s&pageSize=20", url, token, all)
 	}
 
-	a, err := http.Get(endpoint)
+	a, err := getURL(url)
 
 	if err != nil {
 		return "failed"
 	}
 
 	defer a.Body.Close()
+
 	var con fakeNews
+
 	json.NewDecoder(a.Body).Decode(&con)
 
 	if con.TotalResults != 0 {
@@ -98,7 +101,7 @@ func breitButt(event *irc.Event, token string) string {
 }
 
 // News provides garbage titles from garbage sources
-func news(conn *irc.Connection, r string, event *irc.Event, conf *config.ConfigVars) {
+func news(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	if len(conf.Newsapi) <= 1 {
 		log.Println("newsapi key not found")
 		return

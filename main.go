@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"log"
 	"os"
 
@@ -21,16 +22,16 @@ func main() {
 
 	// set up connection parameters
 	conn := irc.IRC(conf.Handle, conf.Handle)
-	conn.UseTLS = conf.Ssl
-	conn.UseSASL = conf.Sasl
+	conn.UseTLS = conf.TLS
+	conn.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	conn.UseSASL = conf.SASL
 	conn.SASLLogin = conf.Handle
 	conn.SASLPassword = conf.Password
 
 	log.Println("connecting bot...")
 
 	// connnect to server
-	err = conn.Connect(conf.Network)
-	if err != nil {
+	if err := conn.Connect(conf.Network); err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}

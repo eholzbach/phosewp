@@ -3,13 +3,14 @@ package events
 
 import (
 	"fmt"
-	"github.com/eholzbach/phosewp/config"
-	"github.com/thoj/go-ircevent"
 	"strings"
+
+	"github.com/eholzbach/phosewp/config"
+	irc "github.com/thoj/go-ircevent"
 )
 
 // Global event watcher
-func Global(conn *irc.Connection, conf *config.ConfigVars) {
+func Global(conn *irc.Connection, conf config.Vars) {
 	conn.AddCallback("001", func(event *irc.Event) {
 		for _, channel := range conf.Channels {
 			conn.Join(channel)

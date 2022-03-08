@@ -2,14 +2,25 @@
 package plugins
 
 import (
+	"net/http"
 	"strings"
+	"time"
 
 	"github.com/eholzbach/phosewp/config"
 	irc "github.com/thoj/go-ircevent"
 )
 
+func getURL(url string) (*http.Response, error) {
+	c := http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	r, err := c.Get(url)
+	return r, err
+}
+
 // Plugins function handles routing to all plugins
-func Plugins(conn *irc.Connection, conf *config.ConfigVars) {
+func Plugins(conn *irc.Connection, conf config.Vars) {
 	conn.AddCallback("PRIVMSG", func(event *irc.Event) {
 		// reply target
 		var r string

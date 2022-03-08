@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	irc "github.com/thoj/go-ircevent"
 )
@@ -40,8 +41,17 @@ func simple(conn *irc.Connection, r string, event *irc.Event) {
 	}
 
 	// had to set the header for dad jokes
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
 	req, err := http.NewRequest("GET", url, nil)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	req.Header.Set("Accept", "application/json")
 	res, err := client.Do(req)
 
@@ -51,7 +61,9 @@ func simple(conn *irc.Connection, r string, event *irc.Event) {
 	}
 
 	defer res.Body.Close()
+
 	var resp gresp
+
 	json.NewDecoder(res.Body).Decode(&resp)
 
 	switch api[0] {
