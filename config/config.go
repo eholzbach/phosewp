@@ -12,12 +12,12 @@ type Vars struct {
 	Channels      []string
 	Coinmarketcap string
 	Darksky       string
-	Dbfile        string
 	Dictionary    string
 	Handle        string
 	Newsapi       string
 	Network       string
 	Password      string
+	Quotes        string
 	SASL          bool
 	TLS           bool
 	Zipcodes      string
