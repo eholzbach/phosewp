@@ -23,7 +23,7 @@ func quote(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 
 	query := strings.Split(event.Message(), " ")
 
-	db, err := sql.Open("sqlite3", conf.Dbfile)
+	db, err := sql.Open("sqlite3", conf.Quotes)
 
 	if err != nil {
 		log.Println(err)
