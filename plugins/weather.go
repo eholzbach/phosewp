@@ -4,164 +4,68 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 	"strings"
 
 	"github.com/eholzbach/phosewp/config"
 	irc "github.com/thoj/go-ircevent"
 )
 
-type forcast struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	Timezone  string  `json:"timezone"`
-	Currently struct {
-		Time                 int     `json:"time"`
-		Summary              string  `json:"summary"`
-		Icon                 string  `json:"icon"`
-		NearestStormDistance int     `json:"nearestStormDistance"`
-		NearestStormBearing  int     `json:"nearestStormBearing"`
-		PrecipIntensity      int     `json:"precipIntensity"`
-		PrecipProbability    int     `json:"precipProbability"`
-		Temperature          float64 `json:"temperature"`
-		ApparentTemperature  float64 `json:"apparentTemperature"`
-		DewPoint             float64 `json:"dewPoint"`
-		Humidity             float64 `json:"humidity"`
-		Pressure             float64 `json:"pressure"`
-		WindSpeed            float64 `json:"windSpeed"`
-		WindGust             float64 `json:"windGust"`
-		WindBearing          int     `json:"windBearing"`
-		CloudCover           float64 `json:"cloudCover"`
-		UvIndex              int     `json:"uvIndex"`
-		Visibility           float64 `json:"visibility"`
-		Ozone                float64 `json:"ozone"`
-	} `json:"currently"`
-	Minutely struct {
-		Summary string `json:"summary"`
-		Icon    string `json:"icon"`
-		Data    []struct {
-			Time              int `json:"time"`
-			PrecipIntensity   int `json:"precipIntensity"`
-			PrecipProbability int `json:"precipProbability"`
-		} `json:"data"`
-	} `json:"minutely"`
-	Hourly struct {
-		Summary string `json:"summary"`
-		Icon    string `json:"icon"`
-		Data    []struct {
-			Time                int     `json:"time"`
-			Summary             string  `json:"summary"`
-			Icon                string  `json:"icon"`
-			PrecipIntensity     int     `json:"precipIntensity"`
-			PrecipProbability   int     `json:"precipProbability"`
-			Temperature         float64 `json:"temperature"`
-			ApparentTemperature float64 `json:"apparentTemperature"`
-			DewPoint            float64 `json:"dewPoint"`
-			Humidity            float64 `json:"humidity"`
-			Pressure            float64 `json:"pressure"`
-			WindSpeed           float64 `json:"windSpeed"`
-			WindGust            float64 `json:"windGust"`
-			WindBearing         int     `json:"windBearing"`
-			CloudCover          int     `json:"cloudCover"`
-			UvIndex             int     `json:"uvIndex"`
-			Visibility          float64 `json:"visibility"`
-			Ozone               float64 `json:"ozone"`
-			PrecipType          string  `json:"precipType,omitempty"`
-			PrecipAccumulation  float64 `json:"precipAccumulation,omitempty"`
-		} `json:"data"`
-	} `json:"hourly"`
-	Daily struct {
-		Summary string `json:"summary"`
-		Icon    string `json:"icon"`
-		Data    []struct {
-			Time                        int     `json:"time"`
-			Summary                     string  `json:"summary"`
-			Icon                        string  `json:"icon"`
-			SunriseTime                 int     `json:"sunriseTime"`
-			SunsetTime                  int     `json:"sunsetTime"`
-			MoonPhase                   float64 `json:"moonPhase"`
-			PrecipIntensity             float64 `json:"precipIntensity"`
-			PrecipIntensityMax          float64 `json:"precipIntensityMax"`
-			PrecipIntensityMaxTime      int     `json:"precipIntensityMaxTime"`
-			PrecipProbability           float64 `json:"precipProbability"`
-			PrecipType                  string  `json:"precipType"`
-			TemperatureHigh             float64 `json:"temperatureHigh"`
-			TemperatureHighTime         int     `json:"temperatureHighTime"`
-			TemperatureLow              float64 `json:"temperatureLow"`
-			TemperatureLowTime          int     `json:"temperatureLowTime"`
-			ApparentTemperatureHigh     float64 `json:"apparentTemperatureHigh"`
-			ApparentTemperatureHighTime int     `json:"apparentTemperatureHighTime"`
-			ApparentTemperatureLow      float64 `json:"apparentTemperatureLow"`
-			ApparentTemperatureLowTime  int     `json:"apparentTemperatureLowTime"`
-			DewPoint                    float64 `json:"dewPoint"`
-			Humidity                    float64 `json:"humidity"`
-			Pressure                    float64 `json:"pressure"`
-			WindSpeed                   float64 `json:"windSpeed"`
-			WindGust                    float64 `json:"windGust"`
-			WindGustTime                int     `json:"windGustTime"`
-			WindBearing                 int     `json:"windBearing"`
-			CloudCover                  float64 `json:"cloudCover"`
-			UvIndex                     int     `json:"uvIndex"`
-			UvIndexTime                 int     `json:"uvIndexTime"`
-			Visibility                  float64 `json:"visibility"`
-			Ozone                       float64 `json:"ozone"`
-			TemperatureMin              float64 `json:"temperatureMin"`
-			TemperatureMinTime          int     `json:"temperatureMinTime"`
-			TemperatureMax              float64 `json:"temperatureMax"`
-			TemperatureMaxTime          int     `json:"temperatureMaxTime"`
-			ApparentTemperatureMin      float64 `json:"apparentTemperatureMin"`
-			ApparentTemperatureMinTime  int     `json:"apparentTemperatureMinTime"`
-			ApparentTemperatureMax      float64 `json:"apparentTemperatureMax"`
-			ApparentTemperatureMaxTime  int     `json:"apparentTemperatureMaxTime"`
-		} `json:"data"`
-	} `json:"daily"`
-	Flags struct {
-		Sources        []string `json:"sources"`
-		NearestStation float64  `json:"nearest-station"`
-		Units          string   `json:"units"`
-	} `json:"flags"`
-	Offset int `json:"offset"`
+type forecast []struct {
+	WeatherText string `json:"WeatherText"`
+	Temperature struct {
+		Imperial struct {
+			Value float64 `json:"Value"`
+		} `json:"Imperial"`
+	} `json:"Temperature"`
+	RelativeHumidity int `json:"RelativeHumidity"`
+	Wind             struct {
+		Speed struct {
+			Imperial struct {
+				Value float64 `json:"Value"`
+			} `json:"Imperial"`
+		} `json:"Speed"`
+	} `json:"Wind"`
 }
 
-type location struct {
-	Latitude  string
-	Longitude string
-}
-
-type zipcodes struct {
-	Data []struct {
-		Zipcode   string `json:"zipcode"`
-		Latitude  string `json:"latitude"`
-		Longitude string `json:"longitude"`
-	} `json:"data"`
+type location []struct {
+	Key string `json:"Key"`
 }
 
 // weather returns a forcast summary from Darksky
 func weather(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
-	if len(conf.Darksky) <= 1 {
-		log.Println("dark sky api key not found")
+	if len(conf.AccuWeather) <= 1 {
+		log.Println("AccuWeather api key not found")
 		return
 	}
 
-	a := strings.Split(event.Message(), " ")
+	zip := strings.Split(event.Message(), " ")
 
-	if !validInput(a) {
+	if !validInput(zip) {
 		conn.Privmsg(r, "weather only accepts 5 digit zip codes")
 		return
 	}
 
-	file, err := os.Open(conf.Zipcodes)
+	var loc location
+
+	resp, err := getURL(fmt.Sprintf("http://dataservice.accuweather.com/locations/v1/postalcodes/US/search?apikey=%s&q=%s", conf.AccuWeather, zip))
 
 	if err != nil {
-		conn.Privmsg(r, "zipcode data not found")
+		log.Println(err)
 		return
 	}
 
-	l := getCoordinates(a[1], file)
+	defer resp.Body.Close()
+	json.NewDecoder(resp.Body).Decode(&loc)
+	resp.Body.Close()
 
-	url := fmt.Sprintf("https://api.darksky.net/forecast/%s/%s,%s", conf.Darksky, l.Latitude, l.Longitude)
-	resp, err := getURL(url)
+	if len(loc) == 0 {
+		log.Println("location not found")
+		return
+	}
+
+	var forecast forecast
+
+	resp, err = getURL(fmt.Sprintf("http://dataservice.accuweather.com/currentconditions/v1/%s?apikey=%s&details=true", loc[0].Key, conf.AccuWeather))
 
 	if err != nil {
 		log.Println(err)
@@ -170,12 +74,15 @@ func weather(conn *irc.Connection, r string, event *irc.Event, conf config.Vars)
 
 	defer resp.Body.Close()
 
-	var con forcast
+	json.NewDecoder(resp.Body).Decode(&forecast)
 
-	json.NewDecoder(resp.Body).Decode(&con)
+	if len(forecast) <= 0 {
+		return
+	}
 
-	humidity := strconv.FormatFloat(con.Currently.Humidity, 'f', 2, 64)[2:]
-	b := fmt.Sprintf("%s, Wind %.0f mph, Humidity %s%%, Temperature %.0f°", con.Currently.Summary, con.Currently.WindSpeed, humidity, con.Currently.Temperature)
+	b := fmt.Sprintf("%s, Wind %.0f mph, Humidity %d%%, Temperature %.0f°", forecast[0].WeatherText, forecast[0].Wind.Speed.Imperial.Value,
+		forecast[0].RelativeHumidity, forecast[0].Temperature.Imperial.Value)
+
 	conn.Privmsg(r, b)
 }
 
@@ -194,26 +101,4 @@ func validInput(a []string) bool {
 	}
 
 	return i == 5
-}
-
-// getCoordinates resolves estimated gps coorinates from a zipcode
-func getCoordinates(query string, file *os.File) location {
-	var z *zipcodes
-	l := location{"21.343331", "-157.941721"}
-
-	if err := json.NewDecoder(file).Decode(&z); err != nil {
-		return l
-	}
-
-	for _, v := range z.Data {
-		if v.Zipcode == query {
-			l = location{
-				Latitude:  v.Latitude,
-				Longitude: v.Longitude,
-			}
-			return l
-		}
-	}
-
-	return l
 }

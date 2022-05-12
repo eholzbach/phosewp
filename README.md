@@ -14,7 +14,7 @@ tls = true
 handle = 'g1mpb0t'
 channels = [ '#leetbotz', '#lamebotz' ]
 db = '/path/to/sql.db'
-darksky = 'api_key'
+accuweather = 'api_key'
 zipcodes = '/path/to/zipcodes.json'
 newsapi = 'api_key'
 ```

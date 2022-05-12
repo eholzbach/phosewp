@@ -9,9 +9,9 @@ import (
 
 // Vars is a struct of all configuration options
 type Vars struct {
+	AccuWeather   string
 	Channels      []string
 	Coinmarketcap string
-	Darksky       string
 	Dictionary    string
 	Handle        string
 	Newsapi       string
@@ -20,7 +20,6 @@ type Vars struct {
 	Quotes        string
 	SASL          bool
 	TLS           bool
-	Zipcodes      string
 }
 
 // Config reads the configuration file and returns a struct
