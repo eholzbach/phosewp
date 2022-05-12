@@ -21,15 +21,16 @@ func Global(conn *irc.Connection, conf config.Vars) {
 		if len(event.Arguments) != 2 {
 			return
 		}
+
 		conn.Join(event.Arguments[1])
+
 		fmt.Println("INVITE " + strings.Join(event.Arguments, " "))
 	})
 
 	conn.AddCallback("KICK", func(event *irc.Event) {
 		if event.Arguments[1] == conf.Handle {
 			conn.Join(event.Arguments[0])
-			s := fmt.Sprint("eat a bag of dicks, ", event.Nick, ".")
-			conn.Privmsg(event.Arguments[0], s)
+			conn.Privmsg(event.Arguments[0], fmt.Sprint("eat a pinecone, ", event.Nick, "."))
 			fmt.Println("KICKED " + strings.Join(event.Arguments, " "))
 		}
 	})

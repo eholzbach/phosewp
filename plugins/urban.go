@@ -51,8 +51,7 @@ func urban(conn *irc.Connection, r string, event *irc.Event) {
 func defineWord(word string) (*apiResponse, error) {
 	var r *apiResponse
 
-	url := fmt.Sprintf("http://api.urbandictionary.com/v0/define?page=1&term=%s", url.QueryEscape(word))
-	resp, err := getURL(url)
+	resp, err := getURL(fmt.Sprintf("http://api.urbandictionary.com/v0/define?page=1&term=%s", url.QueryEscape(word)))
 
 	if err != nil {
 		return r, err

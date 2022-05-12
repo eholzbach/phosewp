@@ -11,45 +11,7 @@ import (
 )
 
 type webster []struct {
-	Meta struct {
-		ID        string   `json:"id"`
-		UUID      string   `json:"uuid"`
-		Sort      string   `json:"sort"`
-		Src       string   `json:"src"`
-		Section   string   `json:"section"`
-		Stems     []string `json:"stems"`
-		Offensive bool     `json:"offensive"`
-	} `json:"meta"`
-	Hwi struct {
-		Hw  string `json:"hw"`
-		Prs []struct {
-			Mw    string `json:"mw"`
-			Sound struct {
-				Audio string `json:"audio"`
-				Ref   string `json:"ref"`
-				Stat  string `json:"stat"`
-			} `json:"sound"`
-		} `json:"prs"`
-	} `json:"hwi"`
-	Fl  string `json:"fl"`
-	Ins []struct {
-		Il  string `json:"il"`
-		If  string `json:"if"`
-		Prs []struct {
-			Mw    string `json:"mw"`
-			Sound struct {
-				Audio string `json:"audio"`
-				Ref   string `json:"ref"`
-				Stat  string `json:"stat"`
-			} `json:"sound"`
-		} `json:"prs"`
-	} `json:"ins"`
-	Def []struct {
-		Sseq [][][]interface{} `json:"sseq"`
-	} `json:"def"`
-	Et       [][]string `json:"et"`
-	Date     string     `json:"date"`
-	Shortdef []string   `json:"shortdef"`
+	Shortdef []string `json:"shortdef"`
 }
 
 //  Dict queries the Merriam-Webster Collegiate Dictionary
@@ -72,9 +34,7 @@ func dict(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 		log.Println("no parameter found")
 	}
 
-	url := fmt.Sprintf("https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s", word, conf.Dictionary)
-
-	a, err := getURL(url)
+	a, err := getURL(fmt.Sprintf("https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s", word, conf.Dictionary))
 
 	if err != nil {
 		log.Println(err)
