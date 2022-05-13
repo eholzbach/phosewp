@@ -51,6 +51,7 @@ func quote(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	} else {
 		reply = getQuote(db, -0)
 	}
+
 	conn.Privmsg(r, reply)
 }
 
@@ -124,9 +125,7 @@ func dbQuery(db *sql.DB, id int) string {
 	var response string
 	var q string
 
-	a := fmt.Sprintf("SELECT quote FROM quotes WHERE ROWID = %d", id)
-
-	row, err := db.Query(a)
+	row, err := db.Query(fmt.Sprintf("SELECT quote FROM quotes WHERE ROWID = %d", id))
 
 	if err != nil {
 		log.Println(err)
@@ -134,9 +133,11 @@ func dbQuery(db *sql.DB, id int) string {
 
 	for row.Next() {
 		err = row.Scan(&q)
+
 		if err != nil {
 			log.Println(err)
 		}
+
 		response = q
 	}
 

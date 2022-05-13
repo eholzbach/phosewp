@@ -43,13 +43,12 @@ func coins(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 		return
 	}
 
-	url := fmt.Sprintf("https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=%s", coin)
-
 	client := &http.Client{
 		Timeout: time.Second * 10,
 	}
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=%s", coin), nil)
+
 	if err != nil {
 		log.Println(err)
 		return
@@ -59,6 +58,7 @@ func coins(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 	req.Header.Add("X-CMC_PRO_API_KEY", conf.Coinmarketcap)
 
 	resp, err := client.Do(req)
+
 	if err != nil {
 		log.Println(err)
 		return
@@ -72,12 +72,13 @@ func coins(conn *irc.Connection, r string, event *irc.Event, conf config.Vars) {
 
 	for _, v := range d.Data {
 		var c cdata
+
 		if err := json.Unmarshal(*v, &c); err != nil {
 			log.Println(err)
 			return
 		}
-		a := fmt.Sprintf("%s: %s  -  Price: $%.2f  -  Change: 1h %.2f%%,  1d %.2f%%,  30d %.2f%%", c.Symbol, c.Name, c.Quote.USD.Price, c.Quote.USD.PercentChange1H, c.Quote.USD.PercentChange7D, c.Quote.USD.PercentChange30D)
-		conn.Privmsg(r, a)
-	}
 
+		conn.Privmsg(r, fmt.Sprintf("%s: %s  -  Price: $%.2f  -  Change: 1h %.2f%%,  1d %.2f%%,  30d %.2f%%", c.Symbol, c.Name,
+			c.Quote.USD.Price, c.Quote.USD.PercentChange1H, c.Quote.USD.PercentChange7D, c.Quote.USD.PercentChange30D))
+	}
 }
